@@ -1,5 +1,5 @@
 import * as Http from 'http'
-import { SimpleError, HAPPY_ERRORS } from '../error/error'
+import { SimpleError, SIMPLE_ERRORS } from '../error/error'
 
 export interface IParam
 {
@@ -37,7 +37,7 @@ export enum PathResult
     ValueReturned = 2
 }
 
-export interface IHappyServer 
+export interface ISimpleServer 
 {
     InnerServer: Http.Server,
     Routes: Array<IRoute>,
@@ -155,7 +155,7 @@ export const checkParams = (req: IncomingMessage, expectations: Array<IParam>, r
 
     if (unset.length > 0)
     {
-        throw SimpleError.BadRequest(`${HAPPY_ERRORS.MISSING_PARAMETER}${unset.join(',')}`)
+        throw SimpleError.BadRequest(`${SIMPLE_ERRORS.MISSING_PARAMETER}${unset.join(',')}`)
     }
 
     return result
@@ -220,7 +220,7 @@ export const parseBody = (req: IncomingMessage): Promise<Record<string, unknown>
 
         req.on('error', ()=>
         {
-            reject(new Error(HAPPY_ERRORS.UNABLE_TO_READ_BODY))
+            reject(new Error(SIMPLE_ERRORS.UNABLE_TO_READ_BODY))
         })
     })
 }
@@ -269,7 +269,7 @@ const getUriParams = (url: string, regexp: RegExp): Record<string, string> =>
     return response?.groups ?? {}
 }
 
-const servers: Record<number, IHappyServer> = {}
+const servers: Record<number, ISimpleServer> = {}
 
 export const manageError = (res: Http.ServerResponse, err: SimpleError|Error): boolean =>
 {
@@ -357,12 +357,12 @@ export const  parseRequest = async (port: number, req: Http.IncomingMessage, res
     }
 }
 
-export const getServer = (port: number): IHappyServer => 
+export const getServer = (port: number): ISimpleServer => 
 {
     return servers[port]
 }
 
-export const setServer = (port: number, server: IHappyServer): void => 
+export const setServer = (port: number, server: ISimpleServer): void => 
 {
     servers[port] = server
 }

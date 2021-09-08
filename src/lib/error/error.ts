@@ -36,7 +36,7 @@ export class SimpleError extends Error
 
 }
 
-export enum HAPPY_ERRORS 
+export enum SIMPLE_ERRORS 
 {
     MISSING_PARAMETER = 'A parameter is missing : ',
     UNKNOW_PARAMETER = 'Unknown parameter : ',

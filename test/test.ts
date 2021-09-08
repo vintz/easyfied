@@ -1,8 +1,8 @@
 // import { IParam, getParamsFromFunction } from "./lib/web/codeextractor"
 
-import {Happyfied, AddRoute, AddStatic, AddMiddleware, RouteMethod, SimpleError} from '../src/index'
+import {Simplified, AddRoute, AddStatic, AddMiddleware, RouteMethod, SimpleError} from '../src/index'
 
-const hs = Happyfied(80)
+const hs = Simplified(80)
 
 hs.AddRoute(RouteMethod.GET, '/hw1', ()=>
 {

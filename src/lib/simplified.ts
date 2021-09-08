@@ -3,7 +3,7 @@ import * as Url from 'url'
 
 import {
     getParamsFromFunction, 
-    IHappyServer, 
+    ISimpleServer, 
     IRoute, 
     RouteMethod, 
     pathToRegexp, 
@@ -23,10 +23,10 @@ let MainPort = 80
 export const setMainPort = (port: number): void => { MainPort = port}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const AddRoute = (type: RouteMethod, path: string, exec: (...args: any[]) => unknown, portOrServer: number|IHappyServer = 0): void =>
+export const AddRoute = (type: RouteMethod, path: string, exec: (...args: any[]) => unknown, portOrServer: number|ISimpleServer = 0): void =>
 {
     const truePath = path.trim().toLowerCase()
-    const server =  typeof portOrServer === 'object' ? portOrServer as IHappyServer : Simplify(portOrServer as number)
+    const server =  typeof portOrServer === 'object' ? portOrServer as ISimpleServer : Simplified(portOrServer as number)
     const route: IRoute = {
         Method: type,
         Exec: exec,
@@ -38,12 +38,12 @@ export const AddRoute = (type: RouteMethod, path: string, exec: (...args: any[])
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const AddMiddleware = ( exec: (...args: any[]) => unknown, portOrServer: number|IHappyServer = 0): void => 
+export const AddMiddleware = ( exec: (...args: any[]) => unknown, portOrServer: number|ISimpleServer = 0): void => 
 {
     AddRoute(RouteMethod.MIDDLEWARE, '', exec, portOrServer)
 }
 
-export const AddStatic = (baseUrl: string, folderPath: string, portOrServer: number|IHappyServer = 0): void =>
+export const AddStatic = (baseUrl: string, folderPath: string, portOrServer: number|ISimpleServer = 0): void =>
 {
     const fServer = fileServer(folderPath)
     const exec = async (_req: unknown, _res: unknown) => {
@@ -56,7 +56,7 @@ export const AddStatic = (baseUrl: string, folderPath: string, portOrServer: num
     AddRoute(RouteMethod.STATIC, baseUrl, exec, portOrServer)
 }
 
-export const Simplify = (port = 0): IHappyServer =>
+export const Simplified = (port = 0): ISimpleServer =>
 {
     if (port === 0)
         port = MainPort
