@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+      "module": "ES6",
+      "noImplicitAny": true,
+      "removeComments": true,
+      "preserveConstEnums": true,
+      "sourceMap": false,
+      "outDir": "./dist"
+    },
+    "include": ["src/**/*", "test/test.ts", "test/test-autocannon.ts"]
+  }
