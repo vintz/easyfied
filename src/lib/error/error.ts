@@ -1,8 +1,8 @@
 export class SimpleError extends Error
 {
     public code: number
-    public data: string|Record<string, unknown> 
-    constructor(code: number, message: string, data: string|Record<string, unknown> = '')
+    public data: string|unknown[]|Record<string, unknown> 
+    constructor(code: number, message: string, data: string|unknown[]|Record<string, unknown> = '')
     {
         super(message)
         this.code = code
