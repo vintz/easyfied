@@ -33,27 +33,30 @@ const NewValidationFunction = (errorMessage: string, fct: CheckFunction) =>
 
 export const SimpleValidation = {
 
+    Not: (fct: CheckFunction): CheckFunction => {
+        return NewValidationFunction(`NOT : \n ${fct.errorMessage}`, (val: unknown) => {return !fct(val)})
+    },
     Equal : (val2: unknown): CheckFunction => {
-        return NewValidationFunction( `should be equal to ${typeof val2 === 'string'?`"${val2}"` :val2}`, (val: unknown): boolean => {return val === val2})
+        return NewValidationFunction( `equal to ${typeof val2 === 'string'?`"${val2}"` :val2}`, (val: unknown): boolean => {return val === val2})
     },
     GreaterThan: (val2: number): CheckFunction => {
-        return NewValidationFunction( `should be greater than ${val2}`, (val: unknown): boolean => {return val > val2})
+        return NewValidationFunction( `greater than ${val2}`, (val: unknown): boolean => {return val > val2})
     },
     GreaterOrEqual: (val2: number): CheckFunction => {
-        return NewValidationFunction( `should be greater than or equal to ${val2}`, (val: unknown): boolean => {return val >= val2})
+        return NewValidationFunction( `greater than or equal to ${val2}`, (val: unknown): boolean => {return val >= val2})
     },
     LessThan: (val2: number): CheckFunction => {
-        return NewValidationFunction( `should be less than ${val2}`, (val: unknown): boolean => {return val < val2})
+        return NewValidationFunction( `less than ${val2}`, (val: unknown): boolean => {return val < val2})
     },
     LessOrEqual: (val2: number): CheckFunction => {
-        return NewValidationFunction( `should be less than or equal to ${val2}`, (val: unknown): boolean => {return val <= val2})
+        return NewValidationFunction( `less than or equal to ${val2}`, (val: unknown): boolean => {return val <= val2})
     },
     Between: (minVal: number, maxVal: number): CheckFunction => {
-        return NewValidationFunction( `should be between ${minVal} and ${maxVal}`, (val: unknown): boolean => {return val <= maxVal && val >= minVal}) 
+        return NewValidationFunction( `between ${minVal} and ${maxVal}`, (val: unknown): boolean => {return val <= maxVal && val >= minVal}) 
     },
     IsOfType: (val2: string): CheckFunction =>
     {
-        return NewValidationFunction( `should be of type ${val2}`, (val: unknown): boolean => {return typeof val === val2})
+        return NewValidationFunction( `of type ${val2}`, (val: unknown): boolean => {return typeof val === val2})
     },
     IsNumber: (): CheckFunction =>
     {
@@ -64,7 +67,7 @@ export const SimpleValidation = {
         
         if (length >= 0)
         {
-            return NewValidationFunction(`should be a string of length: ${length}`, (val: unknown): boolean => {
+            return NewValidationFunction(`a string of length: ${length}`, (val: unknown): boolean => {
                 return (typeof val === 'string' && (val as string).length === length)
             })
         }
@@ -78,7 +81,7 @@ export const SimpleValidation = {
     IsArray: (length = -1): CheckFunction =>
     {
         const lengthDescription = length >= 0? `of minimal lengh: ${length}`: ''
-        const description = `should be an array ${lengthDescription}`
+        const description = `an array ${lengthDescription}`
         return NewValidationFunction( description, (val: unknown): boolean => {
             return (Array.isArray(val) && 
             (length < 0 || (val as unknown[]).length >= length)
@@ -86,7 +89,7 @@ export const SimpleValidation = {
     },
     HasProperties: (properties: string[]): CheckFunction =>
     {
-        return NewValidationFunction( `should have properties: ${JSON.stringify(properties)}`, (val: unknown): boolean => {
+        return NewValidationFunction( `have properties: ${JSON.stringify(properties)}`, (val: unknown): boolean => {
             return properties.every((propertyName) => propertyName in (val as Record<string, unknown>))
         })
     },
