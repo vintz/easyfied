@@ -43,6 +43,7 @@ export interface ISimpleServer
     Routes: Array<IRoute>,
     AddRoute: (type: RouteMethod, path: string, exec:  (...args: unknown[]) => unknown) => void,
     AddStatic: (baseUrl: string, folderPath: string) => void
+    AddMiddleware: ( exec: (...args: unknown[]) => unknown, portOrServer: number|ISimpleServer) => void
 }
 
 export class IncomingMessage extends Http.IncomingMessage

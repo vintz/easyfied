@@ -74,7 +74,8 @@ export const Simplified = (port = 0): ISimpleServer =>
         InnerServer: innerServer,
         Routes: [],
         AddRoute: (type: RouteMethod, path: string, exec:  (...args: unknown[]) => unknown) => AddRoute(type, path, exec, server),
-        AddStatic: (baseUrl: string, folderPath: string) => AddStatic(baseUrl, folderPath, server)
+        AddStatic: (baseUrl: string, folderPath: string) => AddStatic(baseUrl, folderPath, server),
+        AddMiddleware: ( exec: (...args: unknown[]) => unknown, portOrServer: number|ISimpleServer = 0) => AddMiddleware(exec, portOrServer)
     }   
 
     setServer(port, server)
