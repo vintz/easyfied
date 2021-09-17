@@ -46,6 +46,10 @@ export interface ISimpleServer
     AddMiddleware: ( exec: (...args: unknown[]) => unknown, portOrServer: number|ISimpleServer) => void
 }
 
+export interface ISimpleOptions
+{
+    https?: {key: string, cert: string}
+}
 export class IncomingMessage extends Http.IncomingMessage
 {
     query?: Record<string, unknown>   

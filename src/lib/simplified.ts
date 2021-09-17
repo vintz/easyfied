@@ -1,5 +1,7 @@
 import * as Http from 'http'
+import * as Https from 'https'
 import * as Url from 'url'
+import * as Fs from 'fs'
 
 import {
     getParamsFromFunction, 
@@ -11,6 +13,7 @@ import {
     parseRequest,
     setServer,
     deleteServer,
+    ISimpleOptions,
 } 
     from './net/inner'
 
@@ -56,7 +59,18 @@ export const AddStatic = (baseUrl: string, folderPath: string, portOrServer: num
     AddRoute(RouteMethod.STATIC, baseUrl, exec, portOrServer)
 }
 
-export const Simplified = (port = 0): ISimpleServer =>
+const generateServerOptions = (options: ISimpleOptions): Https.ServerOptions=> 
+{
+    const result: Https.ServerOptions = {}
+    if (options.https)
+    {
+        result.cert = Fs.readFileSync(options.https.cert)
+        result.key = Fs.readFileSync(options.https.key)
+    }
+    return result
+}
+
+export const Simplified = (port = 0, options: ISimpleOptions = {}): ISimpleServer =>
 {
     if (port === 0)
         port = MainPort
@@ -66,7 +80,8 @@ export const Simplified = (port = 0): ISimpleServer =>
     {
         return server
     }
-    const innerServer = Http.createServer(async (req: Http.IncomingMessage, res: Http.ServerResponse) => {
+    const _http = options.https?Https: Http
+    const innerServer = _http.createServer(generateServerOptions(options), async (req: Http.IncomingMessage, res: Http.ServerResponse) => {
         await parseRequest(port, req, res)
     }).listen(port)
     

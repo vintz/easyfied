@@ -2,7 +2,12 @@
 
 import {Simplified, AddRoute, AddStatic, AddMiddleware, RouteMethod, SimpleError} from '../src/index'
 
-const hs = Simplified(80)
+const hs = Simplified(443, {
+    https:
+    {
+        cert: './content/cert/localhost.pem',   
+        key: './content/cert/localhost-key.pem'    
+    }})
 
 hs.AddRoute(RouteMethod.GET, '/hw1', ()=>
 {
