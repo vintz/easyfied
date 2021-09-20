@@ -19,6 +19,7 @@ import {
 
     
 import { fileServer } from './file/fileserver'
+import { AddRedirect } from './net/proxy'
 
 
 let MainPort = 80
@@ -90,7 +91,8 @@ export const Simplified = (port = 0, options: ISimpleOptions = {}): ISimpleServe
         Routes: [],
         AddRoute: (type: RouteMethod, path: string, exec:  (...args: unknown[]) => unknown) => AddRoute(type, path, exec, server),
         AddStatic: (baseUrl: string, folderPath: string) => AddStatic(baseUrl, folderPath, server),
-        AddMiddleware: ( exec: (...args: unknown[]) => unknown, portOrServer: number|ISimpleServer = 0) => AddMiddleware(exec, portOrServer)
+        AddMiddleware: ( exec: (...args: unknown[]) => unknown) => AddMiddleware(exec, server),
+        AddRedirect: (destination: string, relativeUrl?: boolean) => {AddRedirect(destination, server, relativeUrl)}
     }   
 
     setServer(port, server)

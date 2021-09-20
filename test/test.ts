@@ -1,13 +1,15 @@
 // import { IParam, getParamsFromFunction } from "./lib/web/codeextractor"
 
 import {Simplified, AddRoute, AddStatic, AddMiddleware, RouteMethod, SimpleError} from '../src/index'
+import { AddRedirect } from '../src/lib/net/proxy'
 
 const hs = Simplified(443, {
     https:
     {
         cert: './content/cert/localhost.pem',   
         key: './content/cert/localhost-key.pem'    
-    }})
+    }
+})
 
 hs.AddRoute(RouteMethod.GET, '/hw1', ()=>
 {
@@ -57,6 +59,9 @@ AddStatic('/file', './test/media', 90)
 AddRoute(RouteMethod.GET, '/par1', (par1: string) => {
     return par1
 })
+
+AddRedirect('https://localhost', 90, true)
+
 
 // import {isSubPath} from './lib/file/fileserver'
 

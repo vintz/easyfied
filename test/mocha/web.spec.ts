@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import 'mocha'
 
-import {AddRoute, RouteMethod, Close, AddMiddleware, AddStatic, SetResponseCode} from '../../src/index'
+import {AddRoute, RouteMethod, Close, AddMiddleware, AddRedirect, AddStatic, SetResponseCode} from '../../src/index'
 import { SimpleError } from '../../src/lib/error/error'
 import { get, post } from '../testLib'
 
@@ -300,6 +300,25 @@ describe('Addstatic test', () => {
                 expect(res.Code).to.equal(200)
                 const isPng = (res.Result as string).startsWith(String.fromCharCode(0xfffd)+'PNG')
                 expect(isPng).to.equal(true)
+            })
+    })
+})
+
+describe('Redirect test', () => {
+
+    it('should return a png file with a 301 response redirecting to http://localhost:90/plop/hw?titi=toto on http://localhost:8080/hw?titi=toto  ', () => 
+    {
+        const port = 8080
+
+        AddRedirect('http://localhost:90/plop?toto=tiit', port, true)
+        
+        return get({Hostname: 'localhost', Port: port, Path: '/hw?titi=toto'})
+            .then((res) =>
+            {
+                Close(port)
+                expect(res.Code).to.equal(301)
+                
+                expect(res?.Headers?.location).to.equal('http://localhost:90/plop/hw?titi=toto')
             })
     })
 })

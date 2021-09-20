@@ -12,7 +12,8 @@ export interface IOptions
 export interface IResult 
 {
     Code: number
-    Result: string|Record<string, unknown>
+    Result: string|Record<string, unknown>,
+    Headers?: Http.IncomingHttpHeaders
     
 }
 
@@ -47,7 +48,7 @@ export const call = (method: string,  options:IOptions, data: Record<string, unk
                     rawData += chunk 
                 })
                 res.on('end', () => {
-                    const result: IResult = {Code: res.statusCode, Result: null}
+                    const result: IResult = {Code: res.statusCode, Result: null, Headers: res.headers}
                     try {
                         if (options.JsonExpected){
                             const parsedData = JSON.parse(rawData)
@@ -66,7 +67,7 @@ export const call = (method: string,  options:IOptions, data: Record<string, unk
                     
             })
             req.on('error', (e) => {
-                console.error(`problem with request: ${e.message}`);
+                console.error(`problem with request: ${e.message}`)
             })
             if (data != null)
             {

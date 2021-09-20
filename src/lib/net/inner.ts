@@ -10,15 +10,17 @@ export interface IParam
 
 export enum RouteMethod
 {
-    POST = 'POST',
-    GET = 'GET',
-    USE = 'USE',
-    HEAD = 'HEAD',
-    PUT  = 'PUT',
     DELETE = 'DELETE',
-    PATCH = 'PATCH',
+    GET = 'GET',
+    HEAD = 'HEAD',
     MIDDLEWARE = 'MIDDLEWARE',
+    PATCH = 'PATCH',
+    POST = 'POST',
+    PUT  = 'PUT',
+    REDIRECT = 'REDIRECT',
     STATIC = 'STATIC',
+    USE = 'USE',
+
 }
 
 export interface IRoute
@@ -34,7 +36,8 @@ export enum PathResult
 {
     NotInPath =  -1,
     NoReturn = 1,
-    ValueReturned = 2
+    ValueReturned = 2,
+    Redirect = 3 
 }
 
 export interface ISimpleServer 
@@ -43,7 +46,8 @@ export interface ISimpleServer
     Routes: Array<IRoute>,
     AddRoute: (type: RouteMethod, path: string, exec:  (...args: unknown[]) => unknown) => void,
     AddStatic: (baseUrl: string, folderPath: string) => void
-    AddMiddleware: ( exec: (...args: unknown[]) => unknown, portOrServer: number|ISimpleServer) => void
+    AddMiddleware: ( exec: (...args: unknown[]) => unknown) => void
+    AddRedirect(destination: string,  relativeUrl: boolean): void
 }
 
 export interface ISimpleOptions
@@ -113,9 +117,14 @@ export const getParamsFromFunction = (func: Function, lowercase?:boolean): IPara
 /* @Return: -1 => the current route doesn't know current path
 *            1 => the current route should parse the current request without returning a value (middleware) 
 *            2 => the current route should parse the current request and return the final value
+*            3 => the current route is a redirect and should not return anything
 */
 export const checkPath = (path: string | null, route: IRoute, method?: string): PathResult =>
 {
+    if (route.Method === RouteMethod.REDIRECT)
+    {
+        return 3
+    }
     if (route.Method === RouteMethod.MIDDLEWARE || ((route.Method === method || route.Method === RouteMethod.USE ) && route.Regexp.test(path ?? '')))
     {
         return route.Method === RouteMethod.MIDDLEWARE? 1 : 2 
@@ -319,6 +328,12 @@ export const  parseRequest = async (port: number, req: Http.IncomingMessage, res
         for (const idx in server.Routes) {
             const route = server.Routes[idx]
             const isPathValid = checkPath(urlInfo.Route, route, req.method)
+            if (isPathValid === PathResult.Redirect)
+            {
+                await route.Exec(req, res)
+                return
+            }
+
             if (isPathValid !== PathResult.NotInPath)
             {
                 try {
