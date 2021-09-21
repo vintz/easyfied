@@ -1,7 +1,6 @@
 {
   "name": "simplified",
   "version": "1.0.0",
-  "main": "index.js",
   "license": "MIT",
   "dependencies": {
     "http": "^0.0.1-security",
@@ -18,5 +17,19 @@
     "eslint": "^7.30.0",
     "ts-mocha": "^8.0.0",
     "typescript": "^4.3.5"
-  }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "ts-mocha -p tsconfig.testing.json test/**/*.spec.ts",
+    "lint": "eslint '*/**/*.ts' --quiet --fix",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm run lint",
+    "version": "git add -A src",
+    "postversion": "git push && git push --tags"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "main": "dist/index.js"
 }
