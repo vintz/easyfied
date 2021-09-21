@@ -17,8 +17,9 @@ export type CheckFunction = {
     (val: unknown): boolean
 }
 
-export const Validate = (val: unknown, fct: CheckFunction): void=>
+export const Validate = (val: unknown, validator: CheckFunction|_validator): void=>
 {
+    const fct: CheckFunction = validator instanceof _validator ? validator.GetFunction() : validator
     if (!fct(val))
     {
         throw (new SimpleError(400, `Validation error: ${JSON.stringify(val)}  ${fct.errorMessage} `))
@@ -31,7 +32,7 @@ const NewValidationFunction = (errorMessage: string, fct: CheckFunction) =>
     return fct
 }
 
-export const SimpleValidation = {
+export const SimpleValidatorEx = {
 
     Not: (fct: CheckFunction): CheckFunction => {
         return NewValidationFunction(`NOT : \n ${fct.errorMessage}`, (val: unknown) => {return !fct(val)})
@@ -60,7 +61,7 @@ export const SimpleValidation = {
     },
     IsNumber: (): CheckFunction =>
     {
-        return SimpleValidation.IsOfType('number')
+        return SimpleValidatorEx.IsOfType('number')
     },
     IsString: (length = -1): CheckFunction =>
     {
@@ -71,12 +72,12 @@ export const SimpleValidation = {
                 return (typeof val === 'string' && (val as string).length === length)
             })
         }
-        return SimpleValidation.IsOfType('string')
+        return SimpleValidatorEx.IsOfType('string')
         
     },
     IsObject: (): CheckFunction =>
     {
-        return SimpleValidation.IsOfType('object')
+        return SimpleValidatorEx.IsOfType('object')
     },
     IsArray: (length = -1): CheckFunction =>
     {
@@ -109,5 +110,128 @@ export const SimpleValidation = {
         })
         return NewValidationFunction( description, (val: unknown): boolean => {return fcts.some((fct) => fct(val))})   
     },
+    True: (): CheckFunction =>
+    {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        return NewValidationFunction( '', (val: unknown): boolean => {return true})
+    }
     
+}
+export class _validator 
+{
+    private instructions: CheckFunction[]
+    private not: boolean
+
+    constructor()
+    {
+        this.instructions = []
+    }
+
+    public GetFunction(): CheckFunction
+    {
+        if (this.instructions.length > 1) return SimpleValidatorEx.And(this.instructions)
+
+        if(this.instructions.length == 1) return this.instructions[0]
+
+        return SimpleValidatorEx.True()
+    }   
+
+    public Eval = (val: unknown) =>
+    {
+        return this.GetFunction()(val)
+    }
+
+    private addInstruction = (fct: CheckFunction) =>
+    {
+        if (this.not)
+        {
+            fct = SimpleValidatorEx.Not(fct)
+            this.not = false
+        }
+        this.instructions.push(fct)
+    }
+
+    public Equal = (val: unknown): _validator =>
+    {
+        this.addInstruction(SimpleValidatorEx.Equal(val))
+        return this
+    } 
+
+    public GreaterThan = (val: number): _validator => 
+    {
+        this.addInstruction(SimpleValidatorEx.GreaterThan(val))
+        return this
+    } 
+
+    public GreaterOrEqual = (val: number): _validator => 
+    {
+        this.addInstruction(SimpleValidatorEx.GreaterOrEqual(val))
+        return this
+    } 
+
+    public LessThan = (val: number): _validator => 
+    {
+        this.addInstruction(SimpleValidatorEx.LessThan(val))
+        return this
+    } 
+
+    public LessOrEqual = (val: number): _validator => 
+    {
+        this.addInstruction(SimpleValidatorEx.LessOrEqual(val))
+        return this
+    } 
+
+    public Between = (minVal: number, maxVal: number): _validator => 
+    {
+        this.addInstruction(SimpleValidatorEx.Between(minVal, maxVal))
+        return this
+    }
+
+    public IsOfType = (val: string): _validator =>
+    {
+        this.addInstruction(SimpleValidatorEx.IsOfType(val))
+        return this
+    }
+
+    public IsNumber = (): _validator =>
+    {
+        this.addInstruction(SimpleValidatorEx.IsOfType('number'))
+        return this
+    }
+
+    public IsString = (length = -1): _validator =>
+    {
+        
+        this.addInstruction(SimpleValidatorEx.IsString(length))
+        return this
+    }
+    
+    public IsObject = (): _validator =>
+    {
+        this.addInstruction(SimpleValidatorEx.IsOfType('object'))
+        return this
+    }
+
+    public IsArray = (length = -1): _validator =>
+    {
+        this.addInstruction(SimpleValidatorEx.IsArray(length))
+        return this
+    }
+
+    public HasProperties = (properties: string[]): _validator =>
+    {
+        this.addInstruction(SimpleValidatorEx.HasProperties(properties))
+        return this
+    }
+
+    public get Not(){
+        this.not = !this.not
+        return this       
+    }
+
+}
+
+export const SimpleValidator = (): _validator =>
+{
+    return new _validator()
 }
