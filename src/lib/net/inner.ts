@@ -1,5 +1,5 @@
 import * as Http from 'http'
-import { SimpleError, SIMPLE_ERRORS } from '../error/error'
+import { EasyError, EASY_ERRORS } from '../error/error'
 
 export interface IParam
 {
@@ -40,7 +40,7 @@ export enum PathResult
     Redirect = 3 
 }
 
-export interface ISimpleServer 
+export interface IEasyServer 
 {
     InnerServer: Http.Server,
     Routes: Array<IRoute>,
@@ -50,7 +50,7 @@ export interface ISimpleServer
     AddRedirect(destination: string,  relativeUrl: boolean): void
 }
 
-export interface ISimpleOptions
+export interface IEasyOptions
 {
     https?: {key: string, cert: string}
 }
@@ -169,7 +169,7 @@ export const checkParams = (req: IncomingMessage, expectations: Array<IParam>, r
 
     if (unset.length > 0)
     {
-        throw SimpleError.BadRequest(`${SIMPLE_ERRORS.MISSING_PARAMETER}${unset.join(',')}`)
+        throw EasyError.BadRequest(`${EASY_ERRORS.MISSING_PARAMETER}${unset.join(',')}`)
     }
 
     return result
@@ -219,7 +219,7 @@ export const parseBody = (req: IncomingMessage): Promise<Record<string, unknown>
                 }
                 catch(err)
                 {
-                    reject(SimpleError.BadRequest('unable to parse json body'))
+                    reject(EasyError.BadRequest('unable to parse json body'))
                     return 
                 }
                 
@@ -234,7 +234,7 @@ export const parseBody = (req: IncomingMessage): Promise<Record<string, unknown>
 
         req.on('error', ()=>
         {
-            reject(new Error(SIMPLE_ERRORS.UNABLE_TO_READ_BODY))
+            reject(new Error(EASY_ERRORS.UNABLE_TO_READ_BODY))
         })
     })
 }
@@ -283,11 +283,11 @@ const getUriParams = (url: string, regexp: RegExp): Record<string, string> =>
     return response?.groups ?? {}
 }
 
-const servers: Record<number, ISimpleServer> = {}
+const servers: Record<number, IEasyServer> = {}
 
-export const manageError = (res: Http.ServerResponse, err: SimpleError|Error): boolean =>
+export const manageError = (res: Http.ServerResponse, err: EasyError|Error): boolean =>
 {
-    const code = Object.keys(err).includes('code')? (err as SimpleError).code : 500
+    const code = Object.keys(err).includes('code')? (err as EasyError).code : 500
     respond(res, code, err.message)
     return true
 }
@@ -377,12 +377,12 @@ export const  parseRequest = async (port: number, req: Http.IncomingMessage, res
     }
 }
 
-export const getServer = (port: number): ISimpleServer => 
+export const getServer = (port: number): IEasyServer => 
 {
     return servers[port]
 }
 
-export const setServer = (port: number, server: ISimpleServer): void => 
+export const setServer = (port: number, server: IEasyServer): void => 
 {
     servers[port] = server
 }

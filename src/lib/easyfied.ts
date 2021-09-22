@@ -5,7 +5,7 @@ import * as Fs from 'fs'
 
 import {
     getParamsFromFunction, 
-    ISimpleServer, 
+    IEasyServer, 
     IRoute, 
     RouteMethod, 
     pathToRegexp, 
@@ -13,7 +13,7 @@ import {
     parseRequest,
     setServer,
     deleteServer,
-    ISimpleOptions,
+    IEasyOptions,
 } 
     from './net/inner'
 
@@ -27,10 +27,10 @@ let MainPort = 80
 export const setMainPort = (port: number): void => { MainPort = port}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const AddRoute = (type: RouteMethod, path: string, exec: (...args: any[]) => unknown, portOrServer: number|ISimpleServer = 0): void =>
+export const AddRoute = (type: RouteMethod, path: string, exec: (...args: any[]) => unknown, portOrServer: number|IEasyServer = 0): void =>
 {
     const truePath = path.trim().toLowerCase()
-    const server =  typeof portOrServer === 'object' ? portOrServer as ISimpleServer : Simplified(portOrServer as number)
+    const server =  typeof portOrServer === 'object' ? portOrServer as IEasyServer : Easyfied(portOrServer as number)
     const route: IRoute = {
         Method: type,
         Exec: exec,
@@ -42,12 +42,12 @@ export const AddRoute = (type: RouteMethod, path: string, exec: (...args: any[])
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const AddMiddleware = ( exec: (...args: any[]) => unknown, portOrServer: number|ISimpleServer = 0): void => 
+export const AddMiddleware = ( exec: (...args: any[]) => unknown, portOrServer: number|IEasyServer = 0): void => 
 {
     AddRoute(RouteMethod.MIDDLEWARE, '', exec, portOrServer)
 }
 
-export const AddStatic = (baseUrl: string, folderPath: string, portOrServer: number|ISimpleServer = 0): void =>
+export const AddStatic = (baseUrl: string, folderPath: string, portOrServer: number|IEasyServer = 0): void =>
 {
     const fServer = fileServer(folderPath)
     const exec = async (_req: unknown, _res: unknown) => {
@@ -60,7 +60,7 @@ export const AddStatic = (baseUrl: string, folderPath: string, portOrServer: num
     AddRoute(RouteMethod.STATIC, baseUrl, exec, portOrServer)
 }
 
-const generateServerOptions = (options: ISimpleOptions): Https.ServerOptions=> 
+const generateServerOptions = (options: IEasyOptions): Https.ServerOptions=> 
 {
     const result: Https.ServerOptions = {}
     if (options.https)
@@ -71,7 +71,7 @@ const generateServerOptions = (options: ISimpleOptions): Https.ServerOptions=>
     return result
 }
 
-export const Simplified = (port = 0, options: ISimpleOptions = {}): ISimpleServer =>
+export const Easyfied = (port = 0, options: IEasyOptions = {}): IEasyServer =>
 {
     if (port === 0)
         port = MainPort

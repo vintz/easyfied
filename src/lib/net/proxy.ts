@@ -2,10 +2,10 @@ import * as Http from 'http'
 import {URL} from 'url'
 import * as Path from 'path'
 
-import {  AddRoute } from '../simplified'
-import { ISimpleServer, RouteMethod } from './inner'
+import {  AddRoute } from '../easyfied'
+import { IEasyServer, RouteMethod } from './inner'
 
-export const AddRedirect = (destination: string, portOrServer: number|ISimpleServer = 0, relativeUrl: boolean): void =>
+export const AddRedirect = (destination: string, portOrServer: number|IEasyServer = 0, relativeUrl: boolean): void =>
 {
     AddRoute(RouteMethod.REDIRECT, '', (_req: Http.IncomingMessage, _res: Http.ServerResponse) => {
 

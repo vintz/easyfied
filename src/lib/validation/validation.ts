@@ -1,4 +1,4 @@
-import { SimpleError } from '../error/error'
+import { EasyError } from '../error/error'
 
 export interface IValidation 
 {
@@ -22,7 +22,7 @@ export const Validate = (val: unknown, validator: CheckFunction|_validator): voi
     const fct: CheckFunction = validator instanceof _validator ? validator.GetFunction() : validator
     if (!fct(val))
     {
-        throw (new SimpleError(400, `Validation error: ${JSON.stringify(val)}  ${fct.errorMessage} `))
+        throw (new EasyError(400, `Validation error: ${JSON.stringify(val)}  ${fct.errorMessage} `))
     }
 }
 
@@ -32,7 +32,7 @@ const NewValidationFunction = (errorMessage: string, fct: CheckFunction) =>
     return fct
 }
 
-export const SimpleValidatorEx = {
+export const EasyValidatorEx = {
 
     Not: (fct: CheckFunction): CheckFunction => {
         return NewValidationFunction(`NOT : \n ${fct.errorMessage}`, (val: unknown) => {return !fct(val)})
@@ -61,7 +61,7 @@ export const SimpleValidatorEx = {
     },
     IsNumber: (): CheckFunction =>
     {
-        return SimpleValidatorEx.IsOfType('number')
+        return EasyValidatorEx.IsOfType('number')
     },
     IsString: (length = -1): CheckFunction =>
     {
@@ -72,12 +72,12 @@ export const SimpleValidatorEx = {
                 return (typeof val === 'string' && (val as string).length === length)
             })
         }
-        return SimpleValidatorEx.IsOfType('string')
+        return EasyValidatorEx.IsOfType('string')
         
     },
     IsObject: (): CheckFunction =>
     {
-        return SimpleValidatorEx.IsOfType('object')
+        return EasyValidatorEx.IsOfType('object')
     },
     IsArray: (length = -1): CheckFunction =>
     {
@@ -129,11 +129,11 @@ export class _validator
 
     public GetFunction(): CheckFunction
     {
-        if (this.instructions.length > 1) return SimpleValidatorEx.And(this.instructions)
+        if (this.instructions.length > 1) return EasyValidatorEx.And(this.instructions)
 
         if(this.instructions.length == 1) return this.instructions[0]
 
-        return SimpleValidatorEx.True()
+        return EasyValidatorEx.True()
     }   
 
     public Eval = (val: unknown) =>
@@ -145,7 +145,7 @@ export class _validator
     {
         if (this.not)
         {
-            fct = SimpleValidatorEx.Not(fct)
+            fct = EasyValidatorEx.Not(fct)
             this.not = false
         }
         this.instructions.push(fct)
@@ -153,74 +153,74 @@ export class _validator
 
     public Equal = (val: unknown): _validator =>
     {
-        this.addInstruction(SimpleValidatorEx.Equal(val))
+        this.addInstruction(EasyValidatorEx.Equal(val))
         return this
     } 
 
     public GreaterThan = (val: number): _validator => 
     {
-        this.addInstruction(SimpleValidatorEx.GreaterThan(val))
+        this.addInstruction(EasyValidatorEx.GreaterThan(val))
         return this
     } 
 
     public GreaterOrEqual = (val: number): _validator => 
     {
-        this.addInstruction(SimpleValidatorEx.GreaterOrEqual(val))
+        this.addInstruction(EasyValidatorEx.GreaterOrEqual(val))
         return this
     } 
 
     public LessThan = (val: number): _validator => 
     {
-        this.addInstruction(SimpleValidatorEx.LessThan(val))
+        this.addInstruction(EasyValidatorEx.LessThan(val))
         return this
     } 
 
     public LessOrEqual = (val: number): _validator => 
     {
-        this.addInstruction(SimpleValidatorEx.LessOrEqual(val))
+        this.addInstruction(EasyValidatorEx.LessOrEqual(val))
         return this
     } 
 
     public Between = (minVal: number, maxVal: number): _validator => 
     {
-        this.addInstruction(SimpleValidatorEx.Between(minVal, maxVal))
+        this.addInstruction(EasyValidatorEx.Between(minVal, maxVal))
         return this
     }
 
     public IsOfType = (val: string): _validator =>
     {
-        this.addInstruction(SimpleValidatorEx.IsOfType(val))
+        this.addInstruction(EasyValidatorEx.IsOfType(val))
         return this
     }
 
     public IsNumber = (): _validator =>
     {
-        this.addInstruction(SimpleValidatorEx.IsOfType('number'))
+        this.addInstruction(EasyValidatorEx.IsOfType('number'))
         return this
     }
 
     public IsString = (length = -1): _validator =>
     {
         
-        this.addInstruction(SimpleValidatorEx.IsString(length))
+        this.addInstruction(EasyValidatorEx.IsString(length))
         return this
     }
     
     public IsObject = (): _validator =>
     {
-        this.addInstruction(SimpleValidatorEx.IsOfType('object'))
+        this.addInstruction(EasyValidatorEx.IsOfType('object'))
         return this
     }
 
     public IsArray = (length = -1): _validator =>
     {
-        this.addInstruction(SimpleValidatorEx.IsArray(length))
+        this.addInstruction(EasyValidatorEx.IsArray(length))
         return this
     }
 
     public HasProperties = (properties: string[]): _validator =>
     {
-        this.addInstruction(SimpleValidatorEx.HasProperties(properties))
+        this.addInstruction(EasyValidatorEx.HasProperties(properties))
         return this
     }
 
@@ -231,7 +231,7 @@ export class _validator
 
 }
 
-export const SimpleValidator = (): _validator =>
+export const EasyValidator = (): _validator =>
 {
     return new _validator()
 }

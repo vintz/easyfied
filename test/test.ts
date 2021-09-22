@@ -1,9 +1,9 @@
 // import { IParam, getParamsFromFunction } from "./lib/web/codeextractor"
 
-import {Simplified, AddRoute, AddStatic, AddMiddleware, RouteMethod, SimpleError} from '../src/index'
+import {Easyfied, AddRoute, AddStatic, AddMiddleware, RouteMethod, EasyError} from '../src/index'
 import { AddRedirect } from '../src/lib/net/proxy'
 
-const hs = Simplified(443, {
+const hs = Easyfied(443, {
     https:
     {
         cert: './content/cert/localhost.pem',   
@@ -43,7 +43,7 @@ AddMiddleware((_headers: Record<string, string>) =>
 {
     if(!_headers.toto)
     {
-        throw SimpleError.Forbidden('not logged in')
+        throw EasyError.Forbidden('not logged in')
     }
 }, 8080)
 

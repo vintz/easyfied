@@ -2,7 +2,7 @@ import { ServerResponse } from 'http'
 import * as Path from 'path'
 import * as Fs from 'fs'
 import * as Mime from 'mime-types'
-import { SimpleError } from '../error/error'
+import { EasyError } from '../error/error'
 
 export const isSubPath = (mainPath: string, currentPath: string): boolean => {
     const combined = Path.join(mainPath, currentPath)
@@ -21,12 +21,12 @@ export const fileServer = (mainPath: string): {mainPath: string, getFile:(path: 
                     Fs.stat(fullPath, (err, stat)=>{
                         if (err)
                         {
-                            reject(SimpleError.BadRequest('Unable to open file', err.message))
+                            reject(EasyError.BadRequest('Unable to open file', err.message))
                             return 
                         }
                         if (stat.isDirectory())
                         {
-                            reject(SimpleError.BadRequest('File not found'))
+                            reject(EasyError.BadRequest('File not found'))
                             return 
                         }
                         const mType = Mime.contentType(fullPath)
@@ -43,7 +43,7 @@ export const fileServer = (mainPath: string): {mainPath: string, getFile:(path: 
                 }
                 else 
                 {
-                    reject(SimpleError.BadRequest('Illegal path'))
+                    reject(EasyError.BadRequest('Illegal path'))
                     return 
                 }
             })

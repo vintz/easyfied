@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import 'mocha'
 
-import {SimpleValidator as SV, SimpleValidatorEx as SVex, Validate, CheckFunction} from '../../src/index'
+import {EasyValidator as SV, EasyValidatorEx as SVex, Validate, CheckFunction} from '../../src/index'
 import { _validator } from '../../src/lib/validation/validation'
 
 const testValidation = (val, validation: CheckFunction | _validator, error: string = null) =>
@@ -19,7 +19,7 @@ const testValidation = (val, validation: CheckFunction | _validator, error: stri
     }
 }
 
-describe('Parameters simple validation test', () => {
+describe('Parameters easy validation test', () => {
 
     it('Test equality validation', () => 
     {

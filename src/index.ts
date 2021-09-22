@@ -1,6 +1,6 @@
 export {RouteMethod} from './lib/net/inner'
-export {SimpleError} from './lib/error/error'
-export {Simplified, AddRoute, AddStatic, AddMiddleware, Close, SetResponseCode} from './lib/simplified'
-export {SimpleValidatorEx, SimpleValidator, Validate, CheckFunction} from './lib/validation/validation'
+export {EasyError} from './lib/error/error'
+export {Easyfied, AddRoute, AddStatic, AddMiddleware, Close, SetResponseCode} from './lib/easyfied'
+export {EasyValidatorEx, EasyValidator, Validate, CheckFunction} from './lib/validation/validation'
 export {AddRedirect} from './lib/net/proxy'
 

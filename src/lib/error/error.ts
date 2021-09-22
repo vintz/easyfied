@@ -1,4 +1,4 @@
-export class SimpleError extends Error
+export class EasyError extends Error
 {
     public code: number
     public data: string|unknown[]|Record<string, unknown> 
@@ -9,34 +9,34 @@ export class SimpleError extends Error
         this.data = data
     }
 
-    static BadRequest =  (message: string, data = ''): SimpleError =>
+    static BadRequest =  (message: string, data = ''): EasyError =>
     {
-        return new SimpleError(400, message, data)
+        return new EasyError(400, message, data)
     }
 
-    static NotAuthentified = (message: string, data = ''): SimpleError =>
+    static NotAuthentified = (message: string, data = ''): EasyError =>
     {
-        return new SimpleError(401, message, data)
+        return new EasyError(401, message, data)
     }
 
-    static Forbidden = (message: string, data = ''): SimpleError =>
+    static Forbidden = (message: string, data = ''): EasyError =>
     {
-        return new SimpleError(403, message, data)
+        return new EasyError(403, message, data)
     }
 
-    static NotFound = (message: string, data = ''): SimpleError => 
+    static NotFound = (message: string, data = ''): EasyError => 
     {
-        return new SimpleError(404, message, data)
+        return new EasyError(404, message, data)
     }
 
-    static ServerError = (message: string, data = ''): SimpleError => 
+    static ServerError = (message: string, data = ''): EasyError => 
     {
-        return new SimpleError(500, message, data)
+        return new EasyError(500, message, data)
     }
 
 }
 
-export enum SIMPLE_ERRORS 
+export enum EASY_ERRORS 
 {
     MISSING_PARAMETER = 'A parameter is missing : ',
     UNKNOW_PARAMETER = 'Unknown parameter : ',

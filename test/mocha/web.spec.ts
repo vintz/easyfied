@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import 'mocha'
 
 import {AddRoute, RouteMethod, Close, AddMiddleware, AddRedirect, AddStatic, SetResponseCode} from '../../src/index'
-import { SimpleError } from '../../src/lib/error/error'
+import { EasyError } from '../../src/lib/error/error'
 import { get, post } from '../testLib'
 
 describe('Get method test', () => {
@@ -125,7 +125,7 @@ describe('Get method test', () => {
         const port = 80
 
         AddRoute(RouteMethod.GET, '/error400', () => {
-            throw SimpleError.BadRequest('error found')
+            throw EasyError.BadRequest('error found')
         })
         
         return get({Hostname: 'localhost', Port: port, Path: '/error400'})
@@ -151,7 +151,7 @@ describe('Get method test', () => {
         {
             if(!_headers.authorization || _headers.authorization !== 'ok')
             {
-                throw SimpleError.Forbidden('not logged')
+                throw EasyError.Forbidden('not logged')
             }
         })
 

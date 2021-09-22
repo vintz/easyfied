@@ -2,13 +2,13 @@
 
 
 
-# Simplified
+# Easyfied
 
 Very simple web framework for Node.js
 
-Simplified is a node.js framework aimed at providing the most simple way to manage the different routes of your server.
+Easyfied is a node.js framework aimed at providing the most simple way to manage the different routes of your server.
 
-Simplified tries to fulfill the following features: 
+Easyfied tries to fulfill the following features: 
 
 - **simple routes declaration**: adding a route is as simple as creating a function
 - **simple response management**: the response to a call is the return of the route function
@@ -17,10 +17,10 @@ Simplified tries to fulfill the following features:
 
 ## Quickstart
 
-Add Simplified to your project:
+Add Easyfied to your project:
 
 ```bash
-nmp install --save simplified
+nmp install --save easyfied
 ```
 
 Create index.ts and copy the following content:
@@ -60,7 +60,7 @@ curl http://localhost
 
 ### Response management 
 
-With Simplified, every response is managed by two things:
+With Easyfied, every response is managed by two things:
 
 - the value returned by the route function
 - the exception that could be thrown by the function
@@ -93,22 +93,22 @@ AddRoute(RouteMethod.Get, '/test', (value = '') =>
 
 
 
-If the route function throw an exception, by default, the server will return a 400 error with the content of the exception. You can send other errors by throwing a SimpleError. It is also possible to modify the default error behaviour to hide the internal error. 
+If the route function throw an exception, by default, the server will return a 400 error with the content of the exception. You can send other errors by throwing a EasyError. It is also possible to modify the default error behaviour to hide the internal error. 
 
 ```typescript
 /// Import the need framework elements 
-import {AddRoute, RouteMethod, SimpleError} from 'simplify'
+import {AddRoute, RouteMethod, EasyError} from 'simplify'
 
 // Declare routes 
 AddRoute(RouteMethod.Get, '/test', (value = '') =>
 {
 	if (value === 'ko')
     {
-        throw new SimpleError(401, 'Value was ko')
+        throw new EasyError(401, 'Value was ko')
     }
     else if (value === 'ko2')
     {
-        throw SimpleError.Forbidden('not logged in') 
+        throw EasyError.Forbidden('not logged in') 
     }
     else return {
         result: 'ok'
@@ -126,7 +126,7 @@ The parameters of the route function are used for the call parameters validation
 
 ```typescript
 /// Import the need framework elements 
-import {AddRoute, RouteMethod, SimpleError} from 'simplify'
+import {AddRoute, RouteMethod, EasyError} from 'simplify'
 
 // Declare routes 
 AddRoute(RouteMethod.Get, '/test', (value1, value2 = '') =>
