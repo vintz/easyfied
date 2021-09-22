@@ -1,4 +1,4 @@
-import {AddRoute, SetResponseCode} from '../src/lib/simplify'
+import {AddRoute, SetResponseCode} from '../src/lib/easyfied'
 import { RouteMethod } from '../src/lib/net/inner'
 import { get } from './testLib'
 

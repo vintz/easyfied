@@ -27,7 +27,7 @@ Create index.ts and copy the following content:
 
 ```typescript
 // Import the framework elements
-import {AddRoute, RouteMethod} from 'simplify'
+import {AddRoute, RouteMethod} from 'easyfied'
 
 // Declare a single route
 AddRoute(RouteMethod.GET, '/', ()=>
@@ -51,7 +51,7 @@ curl http://localhost
 
 
 
-## Documentation
+## Main features
 
 1. [Response management](#response-management)
 2. [Parameters validation](#parameters-validation)
@@ -71,7 +71,7 @@ For example:
 
 ```typescript
 // Import the need framework elements 
-import {AddRoute, RouteMethod} from 'simplify'
+import {AddRoute, RouteMethod} from 'easified'
 
 // Declare routes 
 AddRoute(RouteMethod.Get, '/test', (value = '') =>
@@ -93,11 +93,11 @@ AddRoute(RouteMethod.Get, '/test', (value = '') =>
 
 
 
-If the route function throw an exception, by default, the server will return a 400 error with the content of the exception. You can send other errors by throwing a EasyError. It is also possible to modify the default error behaviour to hide the internal error. 
+If the route function throw an exception, by default, the server will return a 400 error with the content of the exception. You can send other errors by throwing a EasyError. It is also possible to modify the default error behavior to hide the internal error. 
 
 ```typescript
 /// Import the need framework elements 
-import {AddRoute, RouteMethod, EasyError} from 'simplify'
+import {AddRoute, RouteMethod, EasyError} from 'easified'
 
 // Declare routes 
 AddRoute(RouteMethod.Get, '/test', (value = '') =>
@@ -116,17 +116,37 @@ AddRoute(RouteMethod.Get, '/test', (value = '') =>
 })
 ```
 
+You may add some "special" parameters to your functions to access to inner part of the query. The special parameters always start with an underscore and are listed in the documentation. 
+
+In the following code, a call to /heders return the headers of the query.
+
+```typescript
+/// Import the need framework elements 
+import {AddRoute, RouteMethod, EasyError} from 'easified'
+
+// Declare routes 
+AddRoute(RouteMethod.Get, '/headers', ( _req: Http.IncomingMessage, value = '') =>
+{
+	if (value === 'ko')
+    {
+        throw new EasyError(401, 'Value was ko')
+    }
+    else return _req.headers
+    
+})
+```
+
 
 
 ### Parameters validation
 
-The parameters of the route function are used for the call parameters validation.  Any call to the server must fill in the same parameters as the route function.  Only the variable without a default value are mandatory.
+The parameters of the route function are used for the call parameters validation.  Any call to the server must fill in the same parameters as the route function.  Only variables without default value are mandatory.
 
  By default, if any parameter is missing, the call will receive a 400 error with a list of the missing parameters.
 
 ```typescript
 /// Import the need framework elements 
-import {AddRoute, RouteMethod, EasyError} from 'simplify'
+import {AddRoute, RouteMethod, EasyError} from 'easified'
 
 // Declare routes 
 AddRoute(RouteMethod.Get, '/test', (value1, value2 = '') =>
@@ -135,9 +155,78 @@ AddRoute(RouteMethod.Get, '/test', (value1, value2 = '') =>
 })
 ```
 
-In the preceding example, a call to http://localhost/test without any parameter  will receive a 400 response with the following message: "Missing parameter: value1
+In the preceding example, a call to http://localhost/test without any parameter  will receive a 400 response with the following message: "Missing parameters: value1" (as value2 has a default value)
+
+You can also provide input validation using the Validation module. 
+
+For example for a simple parameters validation: 
+
+```typescript
+/// Import the need framework elements 
+import {AddRoute, RouteMethod, EasyError, Validate, EasyValidation} from 'easified'
+
+// Declare routes 
+AddRoute(RouteMethod.Get, '/test', (value1, value2, value3 = '') =>
+{
+     Validate(value1, EasyValidation().IsNumber().Between(0,5))
+     Validate(value1, EasyValidation().IsObject().HasProperties(['prop1']))
+     Validate(value3, EasyValidation().IsString(4))
+	[code...]
+})
+```
+
+If some input doesn't validate, the framework will return a 400 error with a description explaining what is expected. 
 
 
 
+### Static files server
 
+A very simple static file server middleware is built-in Easyfied.
+
+For example, the following code will serve files from the directory named *media* when called from http://localhost:8080/files
+
+```typescript
+AddStatic('/files', './media', 8080)
+```
+
+Now you can load files by calling the following URLs
+
+```
+http://localhost:8080/files/image.png
+http://localhost:8080/files/index.html
+http://localhost:8080/files/script.js
+http://localhost:8080/files/css/index.css
+
+```
+
+
+
+### Middlewares
+
+As your server becomes bigger, you may need to add more functionalities apart from direct response. For example, you may want to add some code to check if the user is authenticated. To do this, you can add a middleware that will test the header for the authentication. Since the routes and the middlewares are tested/executed in the order they are added, any route added after the "authentication" middleware won't be called if there is no authentication
+
+
+
+```typescript
+/// Import the need framework elements 
+import {AddRoute, AddMiddlware, RouteMethod, EasyError} from 'easified'
+
+// Declare routes 
+ AddRoute(RouteMethod.GET, '/notlogged', () => {
+     return 'not logged'
+ })
+
+AddMiddleware((_headers: Record<string, string>) => 
+{
+    if(!_headers.authorization || _headers.authorization !== 'ok')
+    {
+        throw EasyError.Forbidden('not logged')
+    }
+})
+
+AddRoute(RouteMethod.GET, '/logged', () => 
+{
+    return 'logged'
+})
+```
 
