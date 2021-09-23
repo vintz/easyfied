@@ -71,7 +71,7 @@ For example:
 
 ```typescript
 // Import the need framework elements 
-import {AddRoute, RouteMethod} from 'easified'
+import {AddRoute, RouteMethod} from 'easyfied'
 
 // Declare routes 
 AddRoute(RouteMethod.Get, '/test', (value = '') =>
@@ -97,7 +97,7 @@ If the route function throw an exception, by default, the server will return a 4
 
 ```typescript
 /// Import the need framework elements 
-import {AddRoute, RouteMethod, EasyError} from 'easified'
+import {AddRoute, RouteMethod, EasyError} from 'easyfied'
 
 // Declare routes 
 AddRoute(RouteMethod.Get, '/test', (value = '') =>
@@ -122,7 +122,7 @@ In the following code, a call to /heders return the headers of the query.
 
 ```typescript
 /// Import the need framework elements 
-import {AddRoute, RouteMethod, EasyError} from 'easified'
+import {AddRoute, RouteMethod, EasyError} from 'easyfied'
 
 // Declare routes 
 AddRoute(RouteMethod.Get, '/headers', ( _req: Http.IncomingMessage, value = '') =>
@@ -146,7 +146,7 @@ The parameters of the route function are used for the call parameters validation
 
 ```typescript
 /// Import the need framework elements 
-import {AddRoute, RouteMethod, EasyError} from 'easified'
+import {AddRoute, RouteMethod, EasyError} from 'easyfied'
 
 // Declare routes 
 AddRoute(RouteMethod.Get, '/test', (value1, value2 = '') =>
@@ -163,7 +163,7 @@ For example for a simple parameters validation:
 
 ```typescript
 /// Import the need framework elements 
-import {AddRoute, RouteMethod, EasyError, Validate, EasyValidation} from 'easified'
+import {AddRoute, RouteMethod, EasyError, Validate, EasyValidation} from 'easyfied'
 
 // Declare routes 
 AddRoute(RouteMethod.Get, '/test', (value1, value2, value3 = '') =>
@@ -209,7 +209,7 @@ As your server becomes bigger, you may need to add more functionalities apart fr
 
 ```typescript
 /// Import the need framework elements 
-import {AddRoute, AddMiddlware, RouteMethod, EasyError} from 'easified'
+import {AddRoute, AddMiddlware, RouteMethod, EasyError} from 'easyfied'
 
 // Declare routes 
  AddRoute(RouteMethod.GET, '/notlogged', () => {
