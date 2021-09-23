@@ -68,7 +68,8 @@ export const EasyValidatorEx = {
         
         if (length >= 0)
         {
-            return NewValidationFunction(`a string of length: ${length}`, (val: unknown): boolean => {
+            return NewValidationFunction(`a string of length: ${length}`, (val: unknown): boolean =>
+            {
                 return (typeof val === 'string' && (val as string).length === length)
             })
         }
@@ -83,15 +84,24 @@ export const EasyValidatorEx = {
     {
         const lengthDescription = length >= 0? `of minimal lengh: ${length}`: ''
         const description = `an array ${lengthDescription}`
-        return NewValidationFunction( description, (val: unknown): boolean => {
+        return NewValidationFunction( description, (val: unknown): boolean => 
+        {
             return (Array.isArray(val) && 
             (length < 0 || (val as unknown[]).length >= length)
             )})
     },
     HasProperties: (properties: string[]): CheckFunction =>
     {
-        return NewValidationFunction( `have properties: ${JSON.stringify(properties)}`, (val: unknown): boolean => {
+        return NewValidationFunction( `have properties: ${JSON.stringify(properties)}`, (val: unknown): boolean => 
+        {
             return properties.every((propertyName) => propertyName in (val as Record<string, unknown>))
+        })
+    },
+    IsSet: (): CheckFunction => 
+    {   
+        return NewValidationFunction('is set', (val: unknown): boolean =>
+        {
+            return (val != undefined && val != null)    
         })
     },
     And: (fcts: CheckFunction[]) : CheckFunction =>
@@ -105,7 +115,8 @@ export const EasyValidatorEx = {
     Or: (fcts: CheckFunction[]) : CheckFunction =>
     {
         let description = 'OR : '
-        fcts.forEach((fct) => {
+        fcts.forEach((fct) => 
+        {
             description += `\n- ${fct.errorMessage} `
         })
         return NewValidationFunction( description, (val: unknown): boolean => {return fcts.some((fct) => fct(val))})   
@@ -136,7 +147,7 @@ export class _validator
         return EasyValidatorEx.True()
     }   
 
-    public Eval = (val: unknown) =>
+    public Eval = (val: unknown): boolean =>
     {
         return this.GetFunction()(val)
     }
@@ -224,9 +235,16 @@ export class _validator
         return this
     }
 
-    public get Not(){
+    public get Not(): _validator
+    {
         this.not = !this.not
         return this       
+    }
+
+    public IsSet(): _validator
+    {
+        this.addInstruction(EasyValidatorEx.IsSet())
+        return this
     }
 
 }
