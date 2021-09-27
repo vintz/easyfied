@@ -302,6 +302,19 @@ describe('Addstatic test', () => {
                 expect(isPng).to.equal(true)
             })
     })
+    it('should return a 404 error response on http://localhost/file/test2.png  ', () => 
+    {
+        const port = 80
+
+        AddStatic('/file', './test/media', port)
+        
+        return get({Hostname: 'localhost', Port: port, Path: '/file/test2.png'})
+            .then((res) =>
+            {
+                Close(port)
+                expect(res.Code).to.equal(404)
+            })
+    })
 })
 
 describe('Redirect test', () => {

@@ -37,7 +37,8 @@ export enum PathResult
     NotInPath =  -1,
     NoReturn = 1,
     ValueReturned = 2,
-    Redirect = 3 
+    Redirect = 3,
+    Static = 4 
 }
 
 export interface IEasyServer 
@@ -48,6 +49,7 @@ export interface IEasyServer
     AddStatic: (baseUrl: string, folderPath: string) => void
     AddMiddleware: ( exec: (...args: unknown[]) => unknown) => void
     AddRedirect(destination: string,  relativeUrl: boolean): void
+   // Plugins: Record<string, (server: IEasyServer) => void>
 }
 
 export interface IEasyOptions
@@ -123,20 +125,20 @@ export const checkPath = (path: string | null, route: IRoute, method?: string): 
 {
     if (route.Method === RouteMethod.REDIRECT)
     {
-        return 3
+        return PathResult.Redirect
     }
     if (route.Method === RouteMethod.MIDDLEWARE || ((route.Method === method || route.Method === RouteMethod.USE ) && route.Regexp.test(path ?? '')))
     {
-        return route.Method === RouteMethod.MIDDLEWARE? 1 : 2 
+        return route.Method === RouteMethod.MIDDLEWARE? PathResult.NoReturn : PathResult.ValueReturned 
     }
 
     if (route.Method === RouteMethod.STATIC && route.Regexp.test(path ?? ''))
-        return 3
+        return PathResult.Static
 
-    return -1 
+    return PathResult.NotInPath
 }
 
-export const checkParams = (req: IncomingMessage, expectations: Array<IParam>, res: Http.ServerResponse, params?: Record<string, unknown>): unknown[] =>
+export const checkParams = (req: IncomingMessage, expectations: Array<IParam>, res: Http.ServerResponse, server: IEasyServer, params?: Record<string, unknown>): unknown[] =>
 {
     const result: unknown[] = []
     const unset: string[] = []
@@ -146,6 +148,7 @@ export const checkParams = (req: IncomingMessage, expectations: Array<IParam>, r
         '_res': res,
         '_method': req.method,
         '_headers': req.headers,
+        '_server': server
     }
     
     expectations.forEach(expectation =>
@@ -340,7 +343,7 @@ export const  parseRequest = async (port: number, req: Http.IncomingMessage, res
                     const params = req2.method === RouteMethod.GET? urlInfo.Parameters : urlInfo.Body
                     const uriParams = getUriParams(req.url || '', route.Regexp)
                     
-                    const data = checkParams(req2, route.Params, res, {...params, ...uriParams})
+                    const data = checkParams(req2, route.Params, res, server, {...params, ...uriParams})
                     const result = await route.Exec(...data)
                     if (isPathValid === PathResult.ValueReturned && !error)
                     {
