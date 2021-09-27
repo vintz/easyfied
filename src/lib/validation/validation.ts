@@ -19,10 +19,12 @@ export type CheckFunction = {
 
 export const Validate = (val: unknown, validator: CheckFunction|_validator): void=>
 {
-    const fct: CheckFunction = validator instanceof _validator ? validator.GetFunction() : validator
+    const isValidator = validator instanceof _validator
+    const name = isValidator ? (validator as  _validator).GetName(): JSON.stringify(val)
+    const fct: CheckFunction = isValidator? (validator as  _validator).GetFunction() : (validator as CheckFunction)
     if (!fct(val))
     {
-        throw (new EasyError(400, `Validation error: ${JSON.stringify(val)}  ${fct.errorMessage} `))
+        throw (new EasyError(400, `Validation error: ${name}  ${fct.errorMessage} `))
     }
 }
 
@@ -132,12 +134,18 @@ export class _validator
 {
     private instructions: CheckFunction[]
     private not: boolean
+    private name: string
 
-    constructor()
+    constructor(name: string)
     {
         this.instructions = []
+        this.name = name
     }
 
+    public GetName = (): string =>
+    {
+        return this.name
+    }
     public GetFunction(): CheckFunction
     {
         if (this.instructions.length > 1) return EasyValidatorEx.And(this.instructions)
@@ -249,7 +257,7 @@ export class _validator
 
 }
 
-export const EasyValidator = (): _validator =>
+export const EasyValidator = (name: string): _validator =>
 {
-    return new _validator()
+    return new _validator(name)
 }
