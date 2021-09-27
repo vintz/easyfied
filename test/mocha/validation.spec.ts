@@ -15,70 +15,81 @@ const testValidation = (val, validation: CheckFunction | _validator, error: stri
     }
     else 
     {
-        expect(fct).to.throw(`Validation error: ${JSON.stringify(val)}  ${error}`)
+        const name = (validation instanceof _validator)? validation.GetName(): JSON.stringify(val)
+        expect(fct).to.throw(`Validation error: ${name}  ${error}`)
     }
 }
 
 describe('Parameters easy validation test', () => {
 
+    it('Test "is set" validation ', () =>
+    {
+        testValidation(2, SV('var').IsSet())
+        testValidation('A', SV('var').IsSet())
+        testValidation({test: 'A'}, SV('var').IsSet())
+        testValidation(undefined, SV('var').IsSet(), 'is set')
+        testValidation(null, SV('var').IsSet(), 'is set')
+
+
+    })
     it('Test equality validation', () => 
     {
-        testValidation('2', SV().Equal('2'))
-        testValidation('2', SV().Equal('3'), 'equal to "3" ')
-        testValidation(2, SV().Equal('2'), 'equal to "2"' )
-        testValidation('2', SV().Equal('3'), 'equal to "3"')
-        testValidation(['2','3'], SV().Equal('2'), 'equal to "2"')
+        testValidation('2', SV('var').Equal('2'))
+        testValidation('2', SV('var').Equal('3'), 'equal to "3" ')
+        testValidation(2, SV('var').Equal('2'), 'equal to "2"' )
+        testValidation('2', SV('var').Equal('3'), 'equal to "3"')
+        testValidation(['2','3'], SV('var').Equal('2'), 'equal to "2"')
     })
 
     it('Test inequality validation', () => 
     {
-        testValidation( '2', SV().GreaterThan(1))
-        testValidation( 2, SV().GreaterThan(2), 'greater than 2 ')
-        testValidation( '2', SV().GreaterOrEqual(1))
-        testValidation( '2', SV().GreaterOrEqual(2))
-        testValidation( 2, SV().GreaterOrEqual(3), 'greater than or equal to 3 ')
+        testValidation( '2', SV('var').GreaterThan(1))
+        testValidation( 2, SV('var').GreaterThan(2), 'greater than 2 ')
+        testValidation( '2', SV('var').GreaterOrEqual(1))
+        testValidation( '2', SV('var').GreaterOrEqual(2))
+        testValidation( 2, SV('var').GreaterOrEqual(3), 'greater than or equal to 3 ')
 
-        testValidation( '2', SV().LessThan(3))
+        testValidation( '2', SV('var').LessThan(3))
         
-        testValidation( 2, SV().LessThan(2), 'less than 2 ')
-        testValidation( '2', SV().LessOrEqual(3))
-        testValidation( '2', SV().LessOrEqual(2))
-        testValidation( 2, SV().LessOrEqual(1), 'less than or equal to 1 ')
+        testValidation( 2, SV('var').LessThan(2), 'less than 2 ')
+        testValidation( '2', SV('var').LessOrEqual(3))
+        testValidation( '2', SV('var').LessOrEqual(2))
+        testValidation( 2, SV('var').LessOrEqual(1), 'less than or equal to 1 ')
 
-        testValidation( '2', SV().Between(-1, 5))
-        testValidation( -2, SV().Between(-1, 5), 'between -1 and 5 ')
-        testValidation( 10, SV().Between(-1, 5), 'between -1 and 5 ')
+        testValidation( '2', SV('var').Between(-1, 5))
+        testValidation( -2, SV('var').Between(-1, 5), 'between -1 and 5 ')
+        testValidation( 10, SV('var').Between(-1, 5), 'between -1 and 5 ')
         
     })
 
     it('Test string type  validation', () => 
     {
-        testValidation( '2', SV().IsString(1))
-        testValidation( '2', SV().IsString(2), 'a string of length: 2 ')
-        testValidation( ['2','3'], SV().IsString(2), 'a string of length: 2 ')
+        testValidation( '2', SV('var').IsString(1))
+        testValidation( '2', SV('var').IsString(2), 'a string of length: 2 ')
+        testValidation( ['2','3'], SV('var').IsString(2), 'a string of length: 2 ')
     })
 
     it('Test array type validation', () => 
     {
-        testValidation( ['2'], SV().IsArray(1))
-        testValidation( ['2', '3'], SV().IsArray(1))
-        testValidation( ['2', '1'], SV().IsArray(3), 'an array of minimal lengh: 3 ')
-        testValidation( '12', SV().IsArray(2), 'an array of minimal lengh: 2 ')
+        testValidation( ['2'], SV('var').IsArray(1))
+        testValidation( ['2', '3'], SV('var').IsArray(1))
+        testValidation( ['2', '1'], SV('var').IsArray(3), 'an array of minimal lengh: 3 ')
+        testValidation( '12', SV('var').IsArray(2), 'an array of minimal lengh: 2 ')
     })
 
     it('Test object type validation', () => 
     {
-        testValidation( {toto:'2'}, SV().IsObject())
-        testValidation( ['2', '1'], SV().IsObject())
-        testValidation( '12', SV().IsObject(), 'of type object ')
+        testValidation( {toto:'2'}, SV('var').IsObject())
+        testValidation( ['2', '1'], SV('var').IsObject())
+        testValidation( '12', SV('var').IsObject(), 'of type object ')
 
-        testValidation( {titi: '1', toto: 2, tata: 3}, SV().HasProperties(['titi', 'tata']))
-        testValidation( {titi: '1', toto: 2}, SV().HasProperties(['titi', 'tata']), 'have properties: ["titi","tata"]')
+        testValidation( {titi: '1', toto: 2, tata: 3}, SV('var').HasProperties(['titi', 'tata']))
+        testValidation( {titi: '1', toto: 2}, SV('var').HasProperties(['titi', 'tata']), 'have properties: ["titi","tata"]')
     })
 
     it('Test AND type validation', () => 
     {
-        const validationFct = SV().IsObject().HasProperties(['toto'])
+        const validationFct = SV('var').IsObject().HasProperties(['toto'])
       
         const error = 'AND : \n- of type object \n- have properties: ["toto"]'
         testValidation( {toto:'2'}, validationFct)
@@ -89,7 +100,7 @@ describe('Parameters easy validation test', () => {
 
     it('Test NOT type validation', () => 
     {
-        const validationFct = SV().IsNumber().Not.GreaterOrEqual(5)
+        const validationFct = SV('var').IsNumber().Not.GreaterOrEqual(5)
 
         const error =  'AND : \n- of type number \n- NOT : \n greater than or equal to 5'
 
