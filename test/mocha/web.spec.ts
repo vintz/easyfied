@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import 'mocha'
 
-import {AddRoute, RouteMethod, Close, AddMiddleware, AddRedirect, AddStatic, SetResponseCode} from '../../src/index'
+import {AddRoute, RouteMethod, Close, AddMiddleware, AddRedirect, AddStatic, SetResponseCode, Easyfied} from '../../src/index'
 import { EasyError } from '../../src/lib/error/error'
 import { get, post } from '../testLib'
 
@@ -24,9 +24,50 @@ describe('Get method test', () => {
             })
     })
 
+    it('should respond with a 500 response on http://localhost/crash', () => 
+    {
+        const port = 80
+
+        AddRoute(RouteMethod.GET, '/crash', () => {
+            throw new Error('Crashed')
+        }, port)
+        
+        return get({Hostname: 'localhost', Port: port, Path: '/crash'})
+            .then((res) =>
+            {
+                Close(port)
+                expect(res.Code).to.equal(500)
+                expect(res.Result).to.equal('Crashed')
+            })
+    })
+
+    it('should respond with a 400 response on http://localhost/crashdefault  ', () => 
+    {
+        const port = 80
+        const message = 'This server has encountered an error. Please try again'
+        Easyfied(port, {defaultError: { code: 400, message}})
+        AddRoute(RouteMethod.GET, '/crashdefault', () => {
+            throw new Error('Crashed')
+        }, port)
+
+
+        
+        return get({Hostname: 'localhost', Port: port, Path: '/crashdefault'})
+            .then((res) =>
+            {
+                Close(port)
+                expect(res.Code).to.equal(400)
+                expect(res.Result).to.equal(message)
+            })
+    })
+
+
     it('should respond with a 204 response on http://localhost/no  ', () => 
     {
         const port = 80
+
+        const message = 'This server has encountered an error. Please try again'
+        Easyfied(port, {defaultError: { code: 400, message}})
 
         AddRoute(RouteMethod.GET, '/no', () => {
             // No return 

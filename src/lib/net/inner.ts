@@ -49,12 +49,14 @@ export interface IEasyServer
     AddStatic: (baseUrl: string, folderPath: string) => void
     AddMiddleware: ( exec: (...args: unknown[]) => unknown) => void
     AddRedirect(destination: string,  relativeUrl: boolean): void
+    DefaultError?: {code: number, message: string}
    // Plugins: Record<string, (server: IEasyServer) => void>
 }
 
 export interface IEasyOptions
 {
     https?: {key: string, cert: string}
+    defaultError?: {code: number, message: string}
 }
 export class IncomingMessage extends Http.IncomingMessage
 {
@@ -359,7 +361,15 @@ export const  parseRequest = async (port: number, req: Http.IncomingMessage, res
                 }
                 catch(err)
                 {
-                    error = err
+                    if (error instanceof EasyError || !server.DefaultError)
+                    {
+                        error = err
+                    }
+                    else 
+                    {
+                       error = server.DefaultError 
+                    }
+                    
                 }
                 finally
                 {

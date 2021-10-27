@@ -92,9 +92,10 @@ export const Easyfied = (port = 0, options: IEasyOptions = {}): IEasyServer =>
         AddRoute: (type: RouteMethod, path: string, exec:  (...args: unknown[]) => unknown) => AddRoute(type, path, exec, server),
         AddStatic: (baseUrl: string, folderPath: string) => AddStatic(baseUrl, folderPath, server),
         AddMiddleware: ( exec: (...args: unknown[]) => unknown) => AddMiddleware(exec, server),
-        AddRedirect: (destination: string, relativeUrl?: boolean) => {AddRedirect(destination, server, relativeUrl)}
-    }   
-
+        AddRedirect: (destination: string, relativeUrl?: boolean) => {AddRedirect(destination, server, relativeUrl)},
+        DefaultError: options.defaultError
+    }  
+    
     setServer(port, server)
 
     return server
