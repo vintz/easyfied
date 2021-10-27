@@ -367,7 +367,7 @@ export const  parseRequest = async (port: number, req: Http.IncomingMessage, res
                     }
                     else 
                     {
-                       error = server.DefaultError 
+                        error = server.DefaultError 
                     }
                     
                 }
