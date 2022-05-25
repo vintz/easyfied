@@ -3,7 +3,7 @@ import 'mocha'
 
 import {AddRoute, RouteMethod, Close, AddMiddleware, AddRedirect, AddStatic, SetResponseCode, Easyfied} from '../../src/index'
 import { EasyError } from '../../src/lib/error/error'
-import { get, post } from '../testLib'
+import { get, post, put } from '../testLib'
 
 describe('Get method test', () => {
 
@@ -267,6 +267,23 @@ describe('Get method test', () => {
         }, port)
         
         return get({Hostname: 'localhost', Port: port, Path: '/hello/mister'})
+            .then((res) =>
+            {
+                Close(port)
+                expect(res.Code).to.equal(200)
+                expect(res.Result).to.equal('hello mister')
+            })
+    })
+
+    it('should respond "hello mister" with a 200 response on (PUT) http://localhost/hello/mister  ', () => 
+    {
+        const port = 80
+
+        AddRoute(RouteMethod.PUT, '/Hello/:name', (name: string) => {
+            return `hello ${name}`
+        }, port)
+        
+        return put({Hostname: 'localhost', Port: port, Path: '/Hello/mister'})
             .then((res) =>
             {
                 Close(port)

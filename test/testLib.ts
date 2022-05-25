@@ -27,6 +27,12 @@ export const get = (options:IOptions): Promise<IResult> =>
     return call('GET', options)
 }
 
+export const put = (options:IOptions): Promise<IResult> =>
+{
+    return call('PUT', options)
+}
+
+
 export const call = (method: string,  options:IOptions, data: Record<string, unknown> = null): Promise<IResult> =>
 {
     return new Promise<IResult>((resolve, reject) => 

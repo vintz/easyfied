@@ -262,7 +262,7 @@ export const pathToRegexp = (path: string, method: RouteMethod): RegExp =>
         res += '$'
     }
    
-    return new RegExp(res, '')
+    return new RegExp(res, 'i')
 }
 
 export const respond = (res: Http.ServerResponse, code: number, body : string|boolean|Record<string, unknown>|null): void =>
