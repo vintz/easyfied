@@ -6,7 +6,8 @@
   "dependencies": {
     "@types/node": "^16.9.6",
     "http": "^0.0.1-security",
-    "mime-types": "^2.1.32"
+    "mime-types": "^2.1.32",
+    "ts-mocha": "^10.0.0"
   },
   "devDependencies": {
     "@types/chai": "^4.2.21",
@@ -17,14 +18,12 @@
     "@typescript-eslint/parser": "^4.28.3",
     "chai": "^4.3.4",
     "eslint": "^7.30.0",
-    "ts-mocha": "^8.0.0",
-    "typescript": "^4.3.5",
-    "mocha": "^10.0.0"
+    "typescript": "^4.3.5"
   },
   "scripts": {
     "build": "tsc",
     "test": "ts-mocha -p tsconfig.testing.json test/**/*.spec.ts",
-    "lint": "eslint '*/**/*.ts' --quiet --fix",
+    "lint": "eslint */**/*.ts --quiet --fix",
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",
     "preversion": "npm run lint",
