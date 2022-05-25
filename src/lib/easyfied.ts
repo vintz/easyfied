@@ -24,7 +24,7 @@ import { AddRedirect } from './net/proxy'
 
 let MainPort = 80
 
-export const setMainPort = (port: number): void => { MainPort = port}
+export const SetMainPort = (port: number): void => { MainPort = port}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const AddRoute = (type: RouteMethod, path: string, exec: (...args: any[]) => unknown, portOrServer: number|IEasyServer = 0): void =>

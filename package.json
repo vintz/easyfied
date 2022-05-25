@@ -6,8 +6,7 @@
   "dependencies": {
     "@types/node": "^16.9.6",
     "http": "^0.0.1-security",
-    "mime-types": "^2.1.32",
-
+    "mime-types": "^2.1.32"
   },
   "devDependencies": {
     "@types/chai": "^4.2.21",
