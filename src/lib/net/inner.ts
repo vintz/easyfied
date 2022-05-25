@@ -265,9 +265,10 @@ export const pathToRegexp = (path: string, method: RouteMethod): RegExp =>
     return new RegExp(res, '')
 }
 
-export const respond = (res: Http.ServerResponse, code: number, body : string|Record<string, unknown>|null): void =>
+export const respond = (res: Http.ServerResponse, code: number, body : string|boolean|Record<string, unknown>|null): void =>
 {
-    if (typeof body === 'object')
+    const objType = typeof body
+    if (objType === 'object')
     {
         res.writeHead(code, {'Content-Type': 'application/json'}) 
         body = JSON.stringify(body)
@@ -276,6 +277,12 @@ export const respond = (res: Http.ServerResponse, code: number, body : string|Re
     {
         res.writeHead(code, {'Content-Type': 'text/html'}) 
     }
+    
+    if (objType !== 'string')
+    {
+        body = body.toString()
+    }
+
     res.write(body, 'utf-8')
 
     res.end() 
@@ -299,6 +306,7 @@ export const manageError = (res: Http.ServerResponse, err: EasyError|Error): boo
 
 const getResponseCode: () => number = () =>
 {
+    
     const code = this ? (this as Record<string, unknown>)?.statusCode : 200
     if (this)  (this as Record<string, unknown>).statusCode = 200
     return code as number || 200
