@@ -1,7 +1,7 @@
 {
   "name": "easyfied",
   "description": "A simple and easy web framework",
-  "version": "1.0.2",
+  "version": "1.0.5",
   "license": "MIT",
   "dependencies": {
     "@types/node": "^16.9.6",
