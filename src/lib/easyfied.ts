@@ -47,9 +47,9 @@ export const AddMiddleware = ( exec: (...args: any[]) => unknown, portOrServer: 
     AddRoute(RouteMethod.MIDDLEWARE, '', exec, portOrServer)
 }
 
-export const AddStatic = (baseUrl: string, folderPath: string, portOrServer: number|IEasyServer = 0): void =>
+export const AddStatic = (baseUrl: string, folderPath: string, options?: {listFiles: boolean},  portOrServer: number|IEasyServer = 0): void =>
 {
-    const fServer = fileServer(folderPath)
+    const fServer = fileServer(folderPath, {listFiles: options?.listFiles, srcPath: baseUrl})
     const exec = async (_req: unknown, _res: unknown) => {
         const url = (_req as Http.IncomingMessage).url
         let subPath = (url && url.startsWith('/'))? url: new Url.URL(url ?? '').pathname
@@ -90,7 +90,7 @@ export const Easyfied = (port = 0, options: IEasyOptions = {}): IEasyServer =>
         InnerServer: innerServer,
         Routes: [],
         AddRoute: (type: RouteMethod, path: string, exec:  (...args: unknown[]) => unknown) => AddRoute(type, path, exec, server),
-        AddStatic: (baseUrl: string, folderPath: string) => AddStatic(baseUrl, folderPath, server),
+        AddStatic: (baseUrl: string, folderPath: string, options?: {listFiles: boolean}) => AddStatic(baseUrl, folderPath, options, server),
         AddMiddleware: ( exec: (...args: unknown[]) => unknown) => AddMiddleware(exec, server),
         AddRedirect: (destination: string, relativeUrl?: boolean) => {AddRedirect(destination, server, relativeUrl)},
         DefaultError: options.defaultError

@@ -3,20 +3,20 @@
 import {Easyfied, AddRoute, AddStatic, AddMiddleware, RouteMethod, EasyError} from '../src/index'
 import { AddRedirect } from '../src/lib/net/proxy'
 
-const hs = Easyfied(443, {
-    https:
-    {
-        cert: './content/cert/localhost.pem',   
-        key: './content/cert/localhost-key.pem'    
-    }
-})
+// const hs = Easyfied(443, {
+//     https:
+//     {
+//         cert: './content/cert/localhost.pem',   
+//         key: './content/cert/localhost-key.pem'    
+//     }
+// })
 
-hs.AddRoute(RouteMethod.GET, '/hw1', ()=>
-{
-    return 'I am a teapot'
-})
+// hs.AddRoute(RouteMethod.GET, '/hw1', ()=>
+// {
+//     return 'I am a teapot'
+// })
 
-hs.AddStatic('content', './content')
+// hs.AddStatic('content', './content')
 
 AddRoute(RouteMethod.GET, '/hw', () => {
     return 'Hello World'
@@ -51,16 +51,16 @@ AddRoute(RouteMethod.POST, '/hello', (name: string) =>{
     return 'hello ' + name
 }, 8080)
 
-AddStatic('/file', './content', 8080)
+AddStatic('/file', './test/media', {listFiles: false}, 8080)
 
 
-AddStatic('/file', './test/media', 90)
+AddStatic('/file', './test/media', {listFiles: true}, 90)
 
 AddRoute(RouteMethod.GET, '/par1', (par1: string) => {
     return par1
 })
 
-AddRedirect('https://localhost', 90, true)
+//AddRedirect('https://localhost', 90, true)
 
 
 // import {isSubPath} from './lib/file/fileserver'

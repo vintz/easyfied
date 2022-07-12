@@ -78,6 +78,20 @@ export const EasyValidatorEx = {
         return EasyValidatorEx.IsOfType('string')
         
     },
+    MatchesPattern: (pattern: string): CheckFunction => {
+        return NewValidationFunction(`with format ${pattern}`, (val: unknown): boolean =>
+        {
+            try 
+            {
+                const regex = new RegExp(pattern)
+                return  (typeof val === 'string' && regex.test(val))
+            }
+            catch(err)
+            {
+                return false
+            }
+        })
+    },
     IsObject: (): CheckFunction =>
     {
         return EasyValidatorEx.IsOfType('object')
@@ -220,8 +234,13 @@ export class _validator
 
     public IsString = (length = -1): _validator =>
     {
-        
         this.addInstruction(EasyValidatorEx.IsString(length))
+        return this
+    }
+    
+    public MatchesPattern = (pattern: string): _validator => 
+    {
+        this.addInstruction(EasyValidatorEx.MatchesPattern(pattern))
         return this
     }
     
@@ -254,7 +273,6 @@ export class _validator
         this.addInstruction(EasyValidatorEx.IsSet())
         return this
     }
-
 }
 
 export const EasyValidator = (name: string): _validator =>

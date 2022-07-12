@@ -9,7 +9,7 @@ export const isSubPath = (mainPath: string, currentPath: string): boolean => {
     return !!combined && combined.startsWith(Path.join(mainPath))
 }
 
-export const fileServer = (mainPath: string): {mainPath: string, getFile:(path: string, res: ServerResponse) => void} => {
+export const fileServer = (mainPath: string, options?: {listFiles: boolean, srcPath: string}): {mainPath: string, getFile:(path: string, res: ServerResponse) => void} => {
     return {
         mainPath: Path.resolve(mainPath),
         getFile: (path: string, res: ServerResponse): Promise<void> =>{
@@ -26,8 +26,34 @@ export const fileServer = (mainPath: string): {mainPath: string, getFile:(path: 
                         }
                         if (stat.isDirectory())
                         {
-                            reject(EasyError.BadRequest('File not found'))
-                            return 
+                            if (options?.listFiles)
+                            {
+                                Fs.readdir(fullPath, (err, files) => 
+                                {
+                                    if (err)
+                                    {
+                                        reject(EasyError.BadRequest('Unable to open folder', err.message))
+                                        return
+                                    }   
+                                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                                    const fileStr = files.reduce((prev, curr, _idx, _arr) => {
+                                        return `<a href="${options?.srcPath}/${curr}"> ${curr}</a><br/>`
+                                    }, '')
+                                    res.writeHead(200, 
+                                        {
+                                            'Content-Type': 'text/html; charset=utf-8',
+                                            'Content-Length': fileStr.length 
+                                        }
+                                    ).end(fileStr)
+                                    resolve()
+                                })
+                                return 
+                            }
+                            else 
+                            {
+                                reject(EasyError.BadRequest('File not found'))  
+                                return 
+                            }
                         }
                         const mType = Mime.contentType(fullPath)
 

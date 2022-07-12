@@ -69,6 +69,13 @@ describe('Parameters easy validation test', () => {
         testValidation( ['2','3'], SV('var').IsString(2), 'a string of length: 2 ')
     })
 
+    it('Test pattern validation', () => 
+    {
+        const pattern = '^(([^<>()\\[\\]\\\\.,;:\\s@"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@"]+)*)|(".+"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$'
+        testValidation( 'test@email.com', SV('var').MatchesPattern(pattern))
+        testValidation( 'test@email.com@', SV('var').MatchesPattern(pattern), `with format ${pattern} `)
+    })
+
     it('Test array type validation', () => 
     {
         testValidation( ['2'], SV('var').IsArray(1))

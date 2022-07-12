@@ -35,7 +35,6 @@ describe('Get method test', () => {
         return get({Hostname: 'localhost', Port: port, Path: '/false'})
             .then((res) =>
             {
-                console.log(res.Result)
                 Close(port)
                 expect(res.Code).to.equal(200)
                 expect(res.Result).to.equal('false')
@@ -53,7 +52,6 @@ describe('Get method test', () => {
         return get({Hostname: 'localhost', Port: port, Path: '/float'})
             .then((res) =>
             {
-                console.log(res.Result)
                 Close(port)
                 expect(res.Code).to.equal(200)
                 expect(res.Result).to.equal('13.3')
