@@ -23,7 +23,7 @@ export type PropertyDef = string | {
     validator: _validator
 }
 
-export const Validate = (val: unknown, validator: CheckFunction|_validator, debug = true): void=>
+export const Validate = (val: unknown, validator: CheckFunction|_validator, debug = false): void=>
 {
     if (debug)
     {
