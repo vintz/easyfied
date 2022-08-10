@@ -1,13 +1,20 @@
 import { expect } from 'chai'
 import 'mocha'
 
-import {EasyValidator as SV, EasyValidatorEx as SVex, Validate, CheckFunction} from '../../src/index'
-import { _validator } from '../../src/lib/validation/validation'
+import {EasyValidator as SV,   EasyValidatorEx as SVex, Validate, CheckFunction} from '../../src/index'
+import { EasyValidator, _validator } from '../../src/lib/validation/validation'
 
-const testValidation = (val, validation: CheckFunction | _validator, error: string = null) =>
+const testValidation = (val, validation: CheckFunction | _validator, error: string | null = null) =>
 {
     const fct = () => {
-        Validate(val, validation)
+        if (validation instanceof _validator)
+        {
+            (validation as _validator).Validate(val)
+        }
+        else 
+        {
+            Validate(val, validation)
+        }
     }
     if (!error)
     {
@@ -29,8 +36,6 @@ describe('Parameters easy validation test', () => {
         testValidation({test: 'A'}, SV('var').IsSet())
         testValidation(undefined, SV('var').IsSet(), 'is set')
         testValidation(null, SV('var').IsSet(), 'is set')
-
-
     })
     it('Test equality validation', () => 
     {
@@ -64,10 +69,16 @@ describe('Parameters easy validation test', () => {
 
     it('Test string type  validation', () => 
     {
-        testValidation( '2', SV('var').IsString(1))
-        testValidation( '2', SV('var').IsString(2), 'a string of length: 2 ')
-        testValidation( ['2','3'], SV('var').IsString(2), 'a string of length: 2 ')
+        testValidation( '12345678', SV('var').IsString(5))
+        testValidation( '2', SV('var').IsString(2), 'a string of minimal length: 2 ')
+        testValidation( '5',  SV('var').IsString(0, 2))
+        testValidation( '12345678',  SV('var').IsString(0, 7), 'a string of maximum length: 7 ')
+        testValidation( '123',  SV('var').IsString(2, 6))
+        testValidation( '1',  SV('var').IsString(2, 7), 'a string with a length between: 2 and 7')
+        testValidation( '12345678',  SV('var').IsString(2, 7), 'a string with a length between: 2 and 7')
     })
+    
+
 
     it('Test pattern validation', () => 
     {
@@ -92,6 +103,9 @@ describe('Parameters easy validation test', () => {
 
         testValidation( {titi: '1', toto: 2, tata: 3}, SV('var').HasProperties(['titi', 'tata']))
         testValidation( {titi: '1', toto: 2}, SV('var').HasProperties(['titi', 'tata']), 'have properties: ["titi","tata"]')
+        testValidation( {email: 'test@test.com', toto: 2, tata: 3}, SV('var').HasProperties([{name:'email', validator: SV('email').MatchesPattern('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$') }, 'tata']))
+        testValidation( {email: 'test@test', toto: 2, tata: 3}, SV('var').HasProperties([{name:'email', validator: SV('email').MatchesPattern('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$') }, 'tata']), 'have properties: ["email": with format ^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$,"tata"]')
+        
     })
 
     it('Test AND type validation', () => 
@@ -121,59 +135,22 @@ describe('Parameters easy validation test', () => {
 
 describe('Parameters extended validation test', () => {
 
-    it('Test equality validation', () => 
-    {
-        testValidation('2', SVex.Equal('2'))
-        testValidation('2', SVex.Equal('3'), 'equal to "3" ')
-        testValidation(2, SVex.Equal('2'), 'equal to "2"' )
-        testValidation('2', SVex.Equal('3'), 'equal to "3"')
-        testValidation(['2','3'], SVex.Equal('2'), 'equal to "2"')
-    })
-
-    it('Test inequality validation', () => 
-    {
-        testValidation( '2', SVex.GreaterThan(1))
-        testValidation( 2, SVex.GreaterThan(2), 'greater than 2 ')
-        testValidation( '2', SVex.GreaterOrEqual(1))
-        testValidation( '2', SVex.GreaterOrEqual(2))
-        testValidation( 2, SVex.GreaterOrEqual(3), 'greater than or equal to 3 ')
-
-        testValidation( '2', SVex.LessThan(3))
-        
-        testValidation( 2, SVex.LessThan(2), 'less than 2 ')
-        testValidation( '2', SVex.LessOrEqual(3))
-        testValidation( '2', SVex.LessOrEqual(2))
-        testValidation( 2, SVex.LessOrEqual(1), 'less than or equal to 1 ')
-
-        testValidation( '2', SVex.Between(-1, 5))
-        testValidation( -2, SVex.Between(-1, 5), 'between -1 and 5 ')
-        testValidation( 10, SVex.Between(-1, 5), 'between -1 and 5 ')
-        
-    })
-
-    it('Test string type  validation', () => 
-    {
-        testValidation( '2', SVex.IsString(1))
-        testValidation( '2', SVex.IsString(2), 'a string of length: 2 ')
-        testValidation( ['2','3'], SVex.IsString(2), 'a string of length: 2 ')
-    })
-
     it('Test array type validation', () => 
     {
-        testValidation( ['2'], SVex.IsArray(1))
-        testValidation( ['2', '3'], SVex.IsArray(1))
-        testValidation( ['2', '1'], SVex.IsArray(3), 'an array of minimal lengh: 3 ')
-        testValidation( '12', SVex.IsArray(2), 'an array of minimal lengh: 2 ')
+        testValidation( ['2'], SV('var').IsArray(1))
+        testValidation( ['2', '3'], SV('var').IsArray(1))
+        testValidation( ['2', '1'], SV('var').IsArray(3), 'an array of minimal lengh: 3 ')
+        testValidation( '12', SV('var').IsArray(2), 'an array of minimal lengh: 2 ')
     })
 
     it('Test object type validation', () => 
     {
-        testValidation( {toto:'2'}, SVex.IsObject())
-        testValidation( ['2', '1'], SVex.IsObject())
-        testValidation( '12', SVex.IsObject(), 'of type object ')
+        testValidation( {toto:'2'}, SV('var').IsObject())
+        testValidation( ['2', '1'], SV('var').IsObject())
+        testValidation( '12', SV('var').IsObject(), 'of type object ')
 
-        testValidation( {titi: '1', toto: 2, tata: 3}, SVex.HasProperties(['titi', 'tata']))
-        testValidation( {titi: '1', toto: 2}, SVex.HasProperties(['titi', 'tata']), 'have properties: ["titi","tata"]')
+        testValidation( {titi: '1', toto: 2, tata: 3}, SV('var').HasProperties(['titi', 'tata']))
+        testValidation( {titi: '1', toto: 2}, SV('var').HasProperties(['titi', 'tata']), 'have properties: ["titi","tata"]')
     })
 
     it('Test AND type validation', () => 

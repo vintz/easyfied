@@ -1,3 +1,4 @@
+import { basename } from 'path'
 import { EasyError } from '../error/error'
 
 export interface IValidation 
@@ -17,11 +18,26 @@ export type CheckFunction = {
     (val: unknown): boolean
 }
 
-export const Validate = (val: unknown, validator: CheckFunction|_validator): void=>
+export type PropertyDef = string | {
+    name: string
+    validator: _validator
+}
+
+export const Validate = (val: unknown, validator: CheckFunction|_validator, debug = true): void=>
 {
+    if (debug)
+    {
+        console.log('-------------')
+        console.debug('VALIDATE', val)
+        console.log('***************')
+    }
     const isValidator = validator instanceof _validator
     const name = isValidator ? (validator as  _validator).GetName(): JSON.stringify(val)
     const fct: CheckFunction = isValidator? (validator as  _validator).GetFunction() : (validator as CheckFunction)
+    if (debug)
+    {
+        console.debug('VALIDATING', fct.errorMessage )
+    }
     if (!fct(val))
     {
         throw (new EasyError(400, `Validation error: ${name}  ${fct.errorMessage} `))
@@ -32,6 +48,28 @@ const NewValidationFunction = (errorMessage: string, fct: CheckFunction) =>
 {
     fct.errorMessage = errorMessage
     return fct
+}
+
+const Errorify = (properties: PropertyDef[]): string => 
+{
+    let error = '['
+    properties.forEach((prop: PropertyDef, index: number) => 
+    {
+        if (index > 0)
+        {
+            error += ','
+        }
+        if (typeof prop === 'string')
+        {
+            error += `"${prop}"`
+        }
+        else 
+        {
+            error += `"${prop.name}": ${prop.validator.GetFunction().errorMessage}`
+        }
+    })
+    error += ']'
+    return error
 }
 
 export const EasyValidatorEx = {
@@ -65,19 +103,42 @@ export const EasyValidatorEx = {
     {
         return EasyValidatorEx.IsOfType('number')
     },
-    IsString: (length = -1): CheckFunction =>
+    IsString: (minLength = 0, maxLength = 0): CheckFunction =>
     {
-        
-        if (length >= 0)
+
+        if (minLength <= 0 && maxLength <= 0)
         {
-            return NewValidationFunction(`a string of length: ${length}`, (val: unknown): boolean =>
-            {
-                return (typeof val === 'string' && (val as string).length === length)
-            })
+            return EasyValidatorEx.IsOfType('string')
         }
-        return EasyValidatorEx.IsOfType('string')
+        
+        let errorMessage = `a string with a length between: ${minLength} and ${maxLength}`
+
+        if (maxLength === minLength)
+        {
+            errorMessage = `a string of length: ${minLength}`
+        }
+
+        if (maxLength <= 0)
+        {
+            errorMessage = `a string of minimal length: ${minLength}`
+            maxLength = Number.MAX_SAFE_INTEGER
+        }
+        
+        if (minLength <= 0)
+        {
+            errorMessage = `a string of maximum length: ${maxLength}`
+        }
+
+        return NewValidationFunction(errorMessage, (val: unknown): boolean =>
+        {
+            return (typeof val === 'string' && (val as string).length <= maxLength && (val as string).length >= minLength)
+        })
+        
+        
+        
         
     },
+    
     MatchesPattern: (pattern: string): CheckFunction => {
         return NewValidationFunction(`with format ${pattern}`, (val: unknown): boolean =>
         {
@@ -106,11 +167,28 @@ export const EasyValidatorEx = {
             (length < 0 || (val as unknown[]).length >= length)
             )})
     },
-    HasProperties: (properties: string[]): CheckFunction =>
+    HasProperties: (properties: PropertyDef[]): CheckFunction =>
     {
-        return NewValidationFunction( `have properties: ${JSON.stringify(properties)}`, (val: unknown): boolean => 
+        return NewValidationFunction( `have properties: ${Errorify(properties)}`, (val: unknown): boolean => 
         {
-            return properties.every((propertyName) => propertyName in (val as Record<string, unknown>))
+            return properties.every((property) => 
+            {
+                let found = false
+                const valRecord = val as Record<string, unknown>
+
+                if(typeof property === 'object')
+                {
+                    found = property.name in (val as Record<string, unknown>) && property.validator.InnerValidate(valRecord[property.name])
+                }
+                else 
+                {
+                    found = property in valRecord
+                }
+                return found
+                
+                
+            })
+
         })
     },
     IsSet: (): CheckFunction => 
@@ -160,6 +238,7 @@ export class _validator
     {
         return this.name
     }
+
     public GetFunction(): CheckFunction
     {
         if (this.instructions.length > 1) return EasyValidatorEx.And(this.instructions)
@@ -232,9 +311,9 @@ export class _validator
         return this
     }
 
-    public IsString = (length = -1): _validator =>
+    public IsString = (minLength = 0, maxLength = 0): _validator =>
     {
-        this.addInstruction(EasyValidatorEx.IsString(length))
+        this.addInstruction(EasyValidatorEx.IsString(minLength, maxLength))
         return this
     }
     
@@ -256,7 +335,7 @@ export class _validator
         return this
     }
 
-    public HasProperties = (properties: string[]): _validator =>
+    public HasProperties = (properties: PropertyDef[]): _validator =>
     {
         this.addInstruction(EasyValidatorEx.HasProperties(properties))
         return this
@@ -272,6 +351,24 @@ export class _validator
     {
         this.addInstruction(EasyValidatorEx.IsSet())
         return this
+    }
+
+    public Validate = (value: unknown): void => 
+    {
+        Validate(value, this, false)
+    }
+
+    public InnerValidate = (value: unknown): boolean => 
+    {
+        try 
+        {
+            Validate(value, this, false)
+            return true
+        }
+        catch(err)
+        {
+            return false
+        }
     }
 }
 

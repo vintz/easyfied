@@ -163,14 +163,14 @@ For example for a simple parameters validation:
 
 ```typescript
 /// Import the need framework elements 
-import {AddRoute, RouteMethod, EasyError, Validate, EasyValidation} from 'easyfied'
+import {AddRoute, RouteMethod, EasyError, Validate, EasyValidator} from 'easyfied'
 
 // Declare routes 
 AddRoute(RouteMethod.Get, '/test', (value1, value2, value3 = '') =>
 {
-     Validate(value1, EasyValidation().IsNumber().Between(0,5))
-     Validate(value1, EasyValidation().IsObject().HasProperties(['prop1']))
-     Validate(value3, EasyValidation().IsString(4))
+     Validate(value1, EasyValidator('value1').IsNumber().Between(0,5))
+     Validate(value1, EasyValidator('value2').IsObject().HasProperties(['prop1']))
+     Validate(value3, EasyValidator('value3').IsString(4))
 	[code...]
 })
 ```
