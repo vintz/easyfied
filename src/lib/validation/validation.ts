@@ -134,9 +134,6 @@ export const EasyValidatorEx = {
             return (typeof val === 'string' && (val as string).length <= maxLength && (val as string).length >= minLength)
         })
         
-        
-        
-        
     },
     
     MatchesPattern: (pattern: string): CheckFunction => {
@@ -219,7 +216,13 @@ export const EasyValidatorEx = {
     {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         return NewValidationFunction( '', (val: unknown): boolean => {return true})
+    },
+    Check: ( checker: (val: unknown) => boolean ): CheckFunction => 
+    {
+        return NewValidationFunction( 'Check function', (val: unknown): boolean => { return checker(val) })
     }
+
+
     
 }
 export class _validator 
@@ -350,6 +353,12 @@ export class _validator
     public IsSet(): _validator
     {
         this.addInstruction(EasyValidatorEx.IsSet())
+        return this
+    }
+
+    public Check(checker: (val: unknown)=>boolean): _validator  
+    {
+        this.addInstruction(EasyValidatorEx.Check(checker))
         return this
     }
 

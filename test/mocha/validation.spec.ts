@@ -205,4 +205,17 @@ describe('Parameters extended validation test', () => {
         testValidation( 'a', validationFct)
     })
 
+
+    it('Test custom check validation', () => 
+    {
+        const validationFct = SVex.Check( (val) => {return val === 'titi'})
+
+        const error = 'Check function'
+
+        testValidation( 'titi', validationFct)
+        testValidation( 12,  validationFct, error)
+        testValidation( {toto:'2'}, validationFct, error)
+        testValidation( 'a', validationFct, error)
+    })
+
 })

@@ -39,6 +39,16 @@ AddRoute(RouteMethod.POST, '/account', (account: string) => {
 }, 8080)
 
 
+AddRoute(RouteMethod.POST, '/check', (element: unknown) => {
+    EasyValidator('element').HasProperties([{name: 'val', validator: EasyValidator('val').Check((val) => {return val === 'toto'})}]).Validate(element)
+    return 'CHECKED'
+}, 8080)
+
+AddRoute(RouteMethod.GET, '/check', (val: string) => {
+    EasyValidator('val').Check((val) => {return val === 'toto'}).Validate(val)
+    return 'Hello World'
+}, 8080)
+
 AddRoute(RouteMethod.GET, '/hw', () => {
     return 'Hello World'
 }, 8080)
