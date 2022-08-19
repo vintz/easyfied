@@ -1,8 +1,8 @@
 import { expect } from 'chai'
 import 'mocha'
 
-import {EasyValidator as SV,   EasyValidatorEx as SVex, Validate, CheckFunction} from '../../src/index'
-import { EasyValidator, _validator } from '../../src/lib/validation/validation'
+import { EasyValidator as SV,   EasyValidatorEx as SVex, Validate, CheckFunction } from '../../src/index'
+import { _validator } from '../../src/lib/validation/validation'
 
 const testValidation = (val, validation: CheckFunction | _validator, error: string | null = null) =>
 {

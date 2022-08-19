@@ -2,6 +2,12 @@
 
 
 
+![npm](https://img.shields.io/npm/v/easyfied.svg)
+![NPM](https://img.shields.io/npm/l/easyfied.svg)
+![npm type definitions](https://img.shields.io/npm/types/easyfied.svg)
+![npm](https://img.shields.io/npm/dt/easyfied.svg)
+![npm bundle size](https://img.shields.io/bundlephobia/min/easyfied.svg)
+
 # Easyfied
 
 Very simple web framework for Node.js
@@ -168,9 +174,9 @@ import {AddRoute, RouteMethod, EasyError, Validate, EasyValidator} from 'easyfie
 // Declare routes 
 AddRoute(RouteMethod.Get, '/test', (value1, value2, value3 = '') =>
 {
-     Validate(value1, EasyValidator('value1').IsNumber().Between(0,5))
-     Validate(value1, EasyValidator('value2').IsObject().HasProperties(['prop1']))
-     Validate(value3, EasyValidator('value3').IsString(4))
+    Validate(value1, EasyValidator('value1').IsNumber().Between(0,5))
+    Validate(value1, EasyValidator('value2').IsObject().HasProperties(['prop1']))
+    Validate(value3, EasyValidator('value3').IsString(4))
 	[code...]
 })
 ```

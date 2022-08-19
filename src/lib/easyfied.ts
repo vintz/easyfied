@@ -27,7 +27,7 @@ let MainPort = 80
 export const SetMainPort = (port: number): void => { MainPort = port}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const    AddRoute = (type: RouteMethod, path: string, exec: (...args: any[]) => unknown, portOrServer: number|IEasyServer = 0): void =>
+export const AddRoute = (type: RouteMethod, path: string, exec: (...args: any[]) => unknown, portOrServer: number|IEasyServer = 0): void =>
 {
     const truePath = path.trim().toLowerCase()
     const server =  typeof portOrServer === 'object' ? portOrServer as IEasyServer : Easyfied(portOrServer as number)
@@ -81,6 +81,7 @@ export const Easyfied = (port = 0, options: IEasyOptions = {}): IEasyServer =>
     {
         return server
     }
+    
     const _http = options.https?Https: Http
     const innerServer = _http.createServer(generateServerOptions(options), async (req: Http.IncomingMessage, res: Http.ServerResponse) => {
         await parseRequest(port, req, res)
