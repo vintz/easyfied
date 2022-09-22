@@ -278,6 +278,7 @@ export const respond = (res: Http.ServerResponse, code: number, body : string|bo
         res.writeHead(code, {'Content-Type': 'text/html'}) 
     }
     
+
     if (objType !== 'string')
     {
         body = body.toString()
@@ -357,7 +358,7 @@ export const  parseRequest = async (port: number, req: Http.IncomingMessage, res
                     const result = await route.Exec(...data)
                     if (isPathValid === PathResult.ValueReturned && !error)
                     {
-                        if (result === void 0)
+                        if (result === void 0 || result == null || result == undefined)
                         {
                             respond(res, 204, null)    
                             return 

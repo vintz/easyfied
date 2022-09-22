@@ -30,7 +30,7 @@ export const SetMainPort = (port: number): void => { MainPort = port}
 export const AddRoute = (type: RouteMethod, path: string, exec: (...args: any[]) => unknown, portOrServer: number|IEasyServer = 0): void =>
 {
     const truePath = path.trim().toLowerCase()
-    const server =  typeof portOrServer === 'object' ? portOrServer as IEasyServer : Easyfied(portOrServer as number)
+    const server =  typeof portOrServer === 'object' ? portOrServer as IEasyServer : innerEasyFied(portOrServer as number)
     const route: IRoute = {
         Method: type,
         Exec: exec,
@@ -70,8 +70,34 @@ const generateServerOptions = (options: IEasyOptions): Https.ServerOptions=>
     }
     return result
 }
+/**
+ * Initialize a Easyfied web server
+ * {string} [somebody=John Doe] 
+ * @param {number} [port=80] - Web server port (the default port value is 80 by default and can be changed using SetMainPort)
+ * @param {Object} options - Options of the web server
+ * @param {Object} [options.https] - Configuration for HTTPS
+ * @param {string} options.https.key - Filepath of https key
+ * @param {string} options.https.cert - Filepath of https certification
+ * @param {string} [options.defaultError={code: 400, message: ''}] - Default error when answering 
+ * @param {string} options.https.cert - Filepath of https certification
+ * @param {string} options.https.cert - Filepath of https certification
+ * 
+    defaultError?: {code: number, message: string}
+ * @returns 
+ */
 
 export const Easyfied = (port = 0, options: IEasyOptions = {}): IEasyServer =>
+{
+    if (getServer(port))
+    {
+        throw new Error('Server already initialized')
+    }
+
+    return innerEasyFied(port, options)
+    
+}
+
+const innerEasyFied = (port = 0, options: IEasyOptions = {}): IEasyServer =>
 {
     if (port === 0)
         port = MainPort

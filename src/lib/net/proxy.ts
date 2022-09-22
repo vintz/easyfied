@@ -5,6 +5,8 @@ import * as Path from 'path'
 import {  AddRoute } from '../easyfied'
 import { IEasyServer, RouteMethod } from './inner'
 
+
+
 export const AddRedirect = (destination: string, portOrServer: number|IEasyServer = 0, relativeUrl: boolean): void =>
 {
     AddRoute(RouteMethod.REDIRECT, '', (_req: Http.IncomingMessage, _res: Http.ServerResponse) => {
@@ -29,3 +31,20 @@ export const AddRedirect = (destination: string, portOrServer: number|IEasyServe
         _res.end()
     }, portOrServer)
 }
+
+/*export const AddFullRedirection = (originUrl: string, destinationUrl: string): void => 
+{
+    AddRoute(RouteMethod.REDIRECT, '',(_req: Http.IncomingMessage, _res: Http.ServerResponse) => 
+    {
+        try 
+        {
+            return ''
+        }
+        catch(err)
+        {
+            // TODO LOG ERROR
+            console.log(err)
+        
+        }
+    })
+}*/

@@ -1,7 +1,7 @@
 // import { IParam, getParamsFromFunction } from "./lib/web/codeextractor"
 
 import {Easyfied, AddRoute, AddStatic, AddMiddleware, RouteMethod, EasyError, EasyValidator, Validate} from '../src/index'
-import { AddRedirect } from '../src/lib/net/proxy'
+// import { AddRedirect } from '../src/lib/net/proxy'
 
 // const hs = Easyfied(443, {
 //     https:
@@ -96,6 +96,17 @@ AddRoute(RouteMethod.GET, '/par1', (par1: string) => {
     return par1
 }, 8080)
 
+AddRoute(RouteMethod.GET, '/crash', () => 
+{
+    throw new Error('test error')
+})
+
+const serv = Easyfied(91, {defaultError: {code: 400, message: 'CA A PLANTE'}})
+
+serv.AddRoute(RouteMethod.GET, '/crash', () => 
+{
+    throw new Error('Test error other server')
+})
 
 
 //AddRedirect('https://localhost', 90, true)

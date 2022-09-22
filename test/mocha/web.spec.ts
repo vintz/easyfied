@@ -116,6 +116,27 @@ describe('Get method test', () => {
             })
     })
 
+
+    it('should respond with a 204 response on http://localhost/null  ', () => 
+    {
+        const port = 80
+
+        const message = 'This server has encountered an error. Please try again'
+        Easyfied(port, {defaultError: { code: 400, message}})
+
+        AddRoute(RouteMethod.GET, '/null', () => {
+            return null
+        }, port)
+        
+        return get({Hostname: 'localhost', Port: port, Path: '/null'})
+            .then((res) =>
+            {
+                Close(port)
+                expect(res.Code).to.equal(204)
+            })
+    })
+
+
     it('should respond with a 201 response on http://localhost/otherRes  ', () => 
     {
         const port = 80
@@ -384,7 +405,7 @@ describe('Addstatic test', () => {
     {
         const port = 80
 
-        AddStatic('/file', './test/media', port)
+        AddStatic('/file', './test/media', undefined, port)
         
         return get({Hostname: 'localhost', Port: port, Path: '/file/test.png'})
             .then((res) =>
@@ -399,7 +420,7 @@ describe('Addstatic test', () => {
     {
         const port = 80
 
-        AddStatic('/file', './test/media', port)
+        AddStatic('/file', './test/media', undefined, port)
         
         return get({Hostname: 'localhost', Port: port, Path: '/file/test2.png'})
             .then((res) =>
