@@ -1,4 +1,5 @@
 import * as Http from 'http'
+import { IEasyServer } from '../easyfied'
 import { EasyError, EASY_ERRORS } from '../error/error'
 
 export interface IParam
@@ -41,14 +42,10 @@ export enum PathResult
     Static = 4 
 }
 
-export interface IEasyServer 
+export interface IInnerEasyServer extends IEasyServer 
 {
     InnerServer: Http.Server,
     Routes: Array<IRoute>,
-    AddRoute: (type: RouteMethod, path: string, exec:  (...args: unknown[]) => unknown) => void,
-    AddStatic: (baseUrl: string, folderPath: string) => void
-    AddMiddleware: ( exec: (...args: unknown[]) => unknown) => void
-    AddRedirect(destination: string,  relativeUrl: boolean): void
     DefaultError?: {code: number, message: string}
    // Plugins: Record<string, (server: IEasyServer) => void>
 }
@@ -140,7 +137,7 @@ export const checkPath = (path: string | null, route: IRoute, method?: string): 
     return PathResult.NotInPath
 }
 
-export const checkParams = (req: IncomingMessage, expectations: Array<IParam>, res: Http.ServerResponse, server: IEasyServer, params?: Record<string, unknown>): unknown[] =>
+export const checkParams = (req: IncomingMessage, expectations: Array<IParam>, res: Http.ServerResponse, server: IInnerEasyServer, params?: Record<string, unknown>): unknown[] =>
 {
     const result: unknown[] = []
     const unset: string[] = []
@@ -296,7 +293,7 @@ const getUriParams = (url: string, regexp: RegExp): Record<string, string> =>
     return response?.groups ?? {}
 }
 
-const servers: Record<number, IEasyServer> = {}
+const servers: Record<number, IInnerEasyServer> = {}
 
 export const manageError = (res: Http.ServerResponse, err: EasyError|Error): boolean =>
 {
@@ -399,12 +396,12 @@ export const  parseRequest = async (port: number, req: Http.IncomingMessage, res
     }
 }
 
-export const getServer = (port: number): IEasyServer => 
+export const getServer = (port: number): IInnerEasyServer => 
 {
     return servers[port]
 }
 
-export const setServer = (port: number, server: IEasyServer): void => 
+export const setServer = (port: number, server: IInnerEasyServer): void => 
 {
     servers[port] = server
 }

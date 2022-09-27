@@ -5,7 +5,7 @@ import * as Fs from 'fs'
 
 import {
     getParamsFromFunction, 
-    IEasyServer, 
+    IInnerEasyServer, 
     IRoute, 
     RouteMethod, 
     pathToRegexp, 
@@ -24,13 +24,59 @@ import { AddRedirect } from './net/proxy'
 
 let MainPort = 80
 
+const generateServerOptions = (options: IEasyOptions): Https.ServerOptions=> 
+{
+    const result: Https.ServerOptions = {}
+    if (options.https)
+    {
+        result.cert = Fs.readFileSync(options.https.cert)
+        result.key = Fs.readFileSync(options.https.key)
+    }
+    return result
+}
+
+const innerEasyFied = (port = 0, options: IEasyOptions = {}): IInnerEasyServer =>
+{
+    if (port === 0)
+        port = MainPort
+
+    let server = getServer(port)
+    if (server)
+    {
+        return server
+    }
+    
+    const _http = options.https?Https: Http
+    const innerServer = _http.createServer(generateServerOptions(options), async (req: Http.IncomingMessage, res: Http.ServerResponse) => {
+        await parseRequest(port, req, res)
+    }).listen(port)
+    
+    server = {
+        InnerServer: innerServer,
+        Routes: [],
+        AddRoute: (type: RouteMethod, path: string, exec:  (...args: unknown[]) => unknown) => AddRoute(type, path, exec, server),
+        AddStatic: (baseUrl: string, folderPath: string, options?: {listFiles: boolean}) => AddStatic(baseUrl, folderPath, options, server),
+        AddMiddleware: ( exec: (...args: unknown[]) => unknown) => AddMiddleware(exec, server),
+        AddRedirect: (destination: string, relativeUrl?: boolean) => {AddRedirect(destination, server, relativeUrl)},
+        Close: () => {server.InnerServer.close(); deleteServer(port)},
+        DefaultError: options.defaultError
+    }  
+    
+    setServer(port, server)
+
+    return server
+}
+
 export const SetMainPort = (port: number): void => { MainPort = port}
 
+/**
+ * @deprecated This method is deprecated. Will be deleted in version 1.1. Use Easyfied method instead.
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const AddRoute = (type: RouteMethod, path: string, exec: (...args: any[]) => unknown, portOrServer: number|IEasyServer = 0): void =>
+export const AddRoute = (type: RouteMethod, path: string, exec: (...args: any[]) => unknown, portOrServer: number|IInnerEasyServer = 0): void =>
 {
     const truePath = path.trim().toLowerCase()
-    const server =  typeof portOrServer === 'object' ? portOrServer as IEasyServer : innerEasyFied(portOrServer as number)
+    const server =  typeof portOrServer === 'object' ? portOrServer as IInnerEasyServer : innerEasyFied(portOrServer as number)
     const route: IRoute = {
         Method: type,
         Exec: exec,
@@ -41,13 +87,19 @@ export const AddRoute = (type: RouteMethod, path: string, exec: (...args: any[])
     server.Routes.push(route)
 }
 
+/**
+ * @deprecated This method is deprecated. Will be deleted in version 1.1. Use Easyfied method instead.
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const AddMiddleware = ( exec: (...args: any[]) => unknown, portOrServer: number|IEasyServer = 0): void => 
+export const AddMiddleware = ( exec: (...args: any[]) => unknown, portOrServer: number|IInnerEasyServer = 0): void => 
 {
     AddRoute(RouteMethod.MIDDLEWARE, '', exec, portOrServer)
 }
 
-export const AddStatic = (baseUrl: string, folderPath: string, options?: {listFiles: boolean},  portOrServer: number|IEasyServer = 0): void =>
+/**
+ * @deprecated This method is deprecated. Will be deleted in version 1.1. Use Easyfied method instead.
+ */
+export const AddStatic = (baseUrl: string, folderPath: string, options?: {listFiles: boolean},  portOrServer: number|IInnerEasyServer = 0): void =>
 {
     const fServer = fileServer(folderPath, {listFiles: options?.listFiles, srcPath: baseUrl})
     const exec = async (_req: unknown, _res: unknown) => {
@@ -60,16 +112,19 @@ export const AddStatic = (baseUrl: string, folderPath: string, options?: {listFi
     AddRoute(RouteMethod.STATIC, baseUrl, exec, portOrServer)
 }
 
-const generateServerOptions = (options: IEasyOptions): Https.ServerOptions=> 
+
+
+export interface IEasyServer 
 {
-    const result: Https.ServerOptions = {}
-    if (options.https)
-    {
-        result.cert = Fs.readFileSync(options.https.cert)
-        result.key = Fs.readFileSync(options.https.key)
-    }
-    return result
+    AddRoute: (type: RouteMethod, path: string, exec:  (...args: unknown[]) => unknown) => void,
+    AddStatic: (baseUrl: string, folderPath: string) => void
+    AddMiddleware: ( exec: (...args: unknown[]) => unknown) => void
+    AddRedirect(destination: string,  relativeUrl: boolean): void
+    Close(): void
+   // Plugins: Record<string, (server: IEasyServer) => void>
 }
+
+
 /**
  * Initialize a Easyfied web server
  * {string} [somebody=John Doe] 
@@ -93,41 +148,13 @@ export const Easyfied = (port = 0, options: IEasyOptions = {}): IEasyServer =>
         throw new Error('Server already initialized')
     }
 
-    return innerEasyFied(port, options)
-    
+    return innerEasyFied(port, options) as IEasyServer
 }
 
-const innerEasyFied = (port = 0, options: IEasyOptions = {}): IEasyServer =>
-{
-    if (port === 0)
-        port = MainPort
 
-    let server = getServer(port)
-    if (server)
-    {
-        return server
-    }
-    
-    const _http = options.https?Https: Http
-    const innerServer = _http.createServer(generateServerOptions(options), async (req: Http.IncomingMessage, res: Http.ServerResponse) => {
-        await parseRequest(port, req, res)
-    }).listen(port)
-    
-    server = {
-        InnerServer: innerServer,
-        Routes: [],
-        AddRoute: (type: RouteMethod, path: string, exec:  (...args: unknown[]) => unknown) => AddRoute(type, path, exec, server),
-        AddStatic: (baseUrl: string, folderPath: string, options?: {listFiles: boolean}) => AddStatic(baseUrl, folderPath, options, server),
-        AddMiddleware: ( exec: (...args: unknown[]) => unknown) => AddMiddleware(exec, server),
-        AddRedirect: (destination: string, relativeUrl?: boolean) => {AddRedirect(destination, server, relativeUrl)},
-        DefaultError: options.defaultError
-    }  
-    
-    setServer(port, server)
-
-    return server
-}
-
+/**
+ * @deprecated This method is deprecated. Will be deleted in version 1.1. Use Easyfied method instead.
+ */
 export const Close = (port = 0): void =>
 {
     if (port === 0)
@@ -139,6 +166,7 @@ export const Close = (port = 0): void =>
         deleteServer(port)
     }
 }
+
 
 export {setResponseCode as SetResponseCode} from './net/inner'
 
