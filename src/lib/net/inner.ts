@@ -297,8 +297,16 @@ const servers: Record<number, IInnerEasyServer> = {}
 
 export const manageError = (res: Http.ServerResponse, err: EasyError|Error|string): boolean =>
 {
+    
+
+    if (typeof err === 'string')
+    {
+        respond(res, 500, err)
+        return true
+    }
+
     const code = Object.keys(err).includes('code')? (err as EasyError).code : 500
-    respond(res, code, (Object.keys(err).includes('message')? (err as EasyError).message: err) as string)
+    respond(res, code, err.message)
     return true
 }
 
