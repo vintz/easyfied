@@ -295,10 +295,10 @@ const getUriParams = (url: string, regexp: RegExp): Record<string, string> =>
 
 const servers: Record<number, IInnerEasyServer> = {}
 
-export const manageError = (res: Http.ServerResponse, err: EasyError|Error): boolean =>
+export const manageError = (res: Http.ServerResponse, err: EasyError|Error|string): boolean =>
 {
     const code = Object.keys(err).includes('code')? (err as EasyError).code : 500
-    respond(res, code, err.message)
+    respond(res, code, (Object.keys(err).includes('message')? (err as EasyError).message: err) as string)
     return true
 }
 
