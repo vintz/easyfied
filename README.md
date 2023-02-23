@@ -99,7 +99,7 @@ AddRoute(RouteMethod.Get, '/test', (value = '') =>
 
 
 
-If the route function throw an exception, by default, the server will return a 400 error with the content of the exception. You can send other errors by throwing a EasyError. It is also possible to modify the default error behavior to hide the internal error. 
+If the route function throws an exception, by default, the server will return a 400 error with the content of the exception. You can send other errors by throwing a EasyError. It is also possible to modify the default error behavior to hide the internal error. 
 
 ```typescript
 /// Import the need framework elements 
