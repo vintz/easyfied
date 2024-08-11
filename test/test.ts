@@ -1,6 +1,6 @@
 // import { IParam, getParamsFromFunction } from "./lib/web/codeextractor"
 
-import {Easyfied, AddRoute, AddStatic, AddMiddleware, RouteMethod, EasyError, EasyValidator, Validate} from '../src/index'
+import {Easyfied, RouteMethod, EasyError, EasyValidator, Validate} from '../src/index'
 // import { AddRedirect } from '../src/lib/net/proxy'
 
 // const hs = Easyfied(443, {
@@ -18,8 +18,15 @@ import {Easyfied, AddRoute, AddStatic, AddMiddleware, RouteMethod, EasyError, Ea
 
 // hs.AddStatic('content', './content')
 
-AddRoute(RouteMethod.POST, '/account', (account: string) => {
-    console.log(account)
+const server = Easyfied(8080)
+
+server.AddRoute(RouteMethod.GET, '/proxy/*titi', (titi: string) =>
+{
+    console.log(titi)
+    return 'ok proxy'
+})
+
+server.AddRoute(RouteMethod.POST, '/account', (account: string) => {
     try 
     {
         EasyValidator('account').HasProperties([
@@ -36,67 +43,68 @@ AddRoute(RouteMethod.POST, '/account', (account: string) => {
         throw new EasyError(400, 'Invalid account')
     }
     return {test: 'ok'}
-}, 8080)
+})
 
 
-AddRoute(RouteMethod.POST, '/check', (element: unknown) => {
+server.AddRoute(RouteMethod.POST, '/check', (element: unknown) => {
     EasyValidator('element').HasProperties([{name: 'val', validator: EasyValidator('val').Check((val) => {return val === 'toto'})}]).Validate(element)
     return 'CHECKED'
-}, 8080)
+})
 
-AddRoute(RouteMethod.GET, '/check', (val: string) => {
+server.AddRoute(RouteMethod.GET, '/check', (val: string) => {
     EasyValidator('val').Check((val) => {return val === 'toto'}).Validate(val)
     return 'Hello World'
-}, 8080)
+})
 
-AddRoute(RouteMethod.GET, '/hw', () => {
+server.AddRoute(RouteMethod.GET, '/hw', () => {
     return 'Hello World'
-}, 8080)
+})
 
-AddRoute(RouteMethod.GET, '/hello', (name: string) =>{
+server.AddRoute(RouteMethod.GET, '/hello', (name: string) =>{
     return 'hello ' + name
-}, 8080)
+})
 
-AddRoute(RouteMethod.GET, '/hello2/:name', (name: string) =>{
+server.AddRoute(RouteMethod.GET, '/hello2/:name', (name: string) =>{
     return 'hello ' + name
-}, 8080)
+})
 
-AddRoute(RouteMethod.GET, '/no', () =>{
+server.AddRoute(RouteMethod.GET, '/no', () =>{
     console.log('no response')
-}, 8080)
+})
 
-AddRoute(RouteMethod.GET, '/null', () =>{
+server.AddRoute(RouteMethod.GET, '/null', () =>{
     return null
-}, 8080)
+})
 
-AddRoute(RouteMethod.GET, '/test/moi', (test: string) => {
+server.AddRoute(RouteMethod.GET, '/test/moi', (test: string) => {
     Validate(test, EasyValidator('test').IsString(4).MatchesPattern('toto'))
     return test
 
-}, 8080)
+})
 
-AddMiddleware((_headers: Record<string, string>) => 
+server.AddMiddleware((_headers: Record<string, string>) => 
 {
     if(!_headers.toto)
     {
         throw EasyError.Forbidden('not logged in')
     }
-}, 8080)
+})
 
-AddRoute(RouteMethod.POST, '/hello', (name: string) =>{
+server.AddRoute(RouteMethod.POST, '/hello', (name: string) =>{
     return 'hello ' + name
-}, 8080)
+})
 
-AddStatic('/file', './test/media', {listFiles: false}, 8080)
+server.AddStatic('/file', './test/media', {listFiles: false})
 
+const server90 = Easyfied(90);
 
-AddStatic('/file', './test/media', {listFiles: true}, 90)
+server90.AddStatic('/file', './test/media', {listFiles: true})
 
-AddRoute(RouteMethod.GET, '/par1', (par1: string) => {
+server.AddRoute(RouteMethod.GET, '/par1', (par1: string) => {
     return par1
-}, 8080)
+})
 
-AddRoute(RouteMethod.GET, '/crash', () => 
+server.AddRoute(RouteMethod.GET, '/crash', () => 
 {
     throw new Error('test error')
 })
@@ -107,6 +115,8 @@ serv.AddRoute(RouteMethod.GET, '/crash', () =>
 {
     throw new Error('Test error other server')
 })
+
+
 
 
 //AddRedirect('https://localhost', 90, true)

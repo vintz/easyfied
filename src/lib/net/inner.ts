@@ -245,15 +245,22 @@ export const pathToRegexp = (path: string, method: RouteMethod): RegExp =>
 {
     let res = path
     const regexp1 = new RegExp('(:[^/]+)', 'g')
+    const regexp2 = new RegExp('(\\*[^/]+)', 'g')
     let tmp
 
-    res = res.replace(/\*/g, '(.*)')
+    while ((tmp = regexp2.exec(path)) !== null)
+    {
+        const name =  tmp[0].replace('*','')
+        res = res.replace(tmp[0],`(?<${name}>.*)`)
+    }
+
+    //res = res.replace(/\*/g, '(.*)')
     while ((tmp = regexp1.exec(path)) !== null)
     {
         const name =  tmp[0].replace(':','')
         res = res.replace(tmp[0],`(?<${name}>[^/]*)`)
-       
     }
+
     if (method !== RouteMethod.STATIC)
     {
         res += '$'

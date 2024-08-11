@@ -19,7 +19,7 @@ import {
 
     
 import { fileServer } from './file/fileserver'
-import { AddRedirect } from './net/proxy'
+// import { AddRedirect } from './net/proxy'
 
 
 let MainPort = 80
@@ -57,7 +57,7 @@ const innerEasyFied = (port = 0, options: IEasyOptions = {}): IInnerEasyServer =
         AddRoute: (type: RouteMethod, path: string, exec:  (...args: unknown[]) => unknown) => AddRoute(type, path, exec, server),
         AddStatic: (baseUrl: string, folderPath: string, options?: {listFiles: boolean}) => AddStatic(baseUrl, folderPath, options, server),
         AddMiddleware: ( exec: (...args: unknown[]) => unknown) => AddMiddleware(exec, server),
-        AddRedirect: (destination: string, relativeUrl?: boolean) => {AddRedirect(destination, server, relativeUrl)},
+        //AddRedirect: (destination: string, relativeUrl?: boolean) => {AddRedirect(destination, server, relativeUrl)},
         Close: () => {server.InnerServer.close(); deleteServer(port)},
         DefaultError: options.defaultError
     }  
@@ -69,9 +69,6 @@ const innerEasyFied = (port = 0, options: IEasyOptions = {}): IInnerEasyServer =
 
 export const SetMainPort = (port: number): void => { MainPort = port}
 
-/**
- * @deprecated This method is deprecated. Will be deleted in version 1.1. Use Easyfied method instead.
- */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const AddRoute = (type: RouteMethod, path: string, exec: (...args: any[]) => unknown, portOrServer: number|IInnerEasyServer = 0): void =>
 {
@@ -87,18 +84,12 @@ export const AddRoute = (type: RouteMethod, path: string, exec: (...args: any[])
     server.Routes.push(route)
 }
 
-/**
- * @deprecated This method is deprecated. Will be deleted in version 1.1. Use Easyfied method instead.
- */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const AddMiddleware = ( exec: (...args: any[]) => unknown, portOrServer: number|IInnerEasyServer = 0): void => 
 {
     AddRoute(RouteMethod.MIDDLEWARE, '', exec, portOrServer)
 }
 
-/**
- * @deprecated This method is deprecated. Will be deleted in version 1.1. Use Easyfied method instead.
- */
 export const AddStatic = (baseUrl: string, folderPath: string, options?: {listFiles: boolean},  portOrServer: number|IInnerEasyServer = 0): void =>
 {
     const fServer = fileServer(folderPath, {listFiles: options?.listFiles, srcPath: baseUrl})
@@ -112,14 +103,12 @@ export const AddStatic = (baseUrl: string, folderPath: string, options?: {listFi
     AddRoute(RouteMethod.STATIC, baseUrl, exec, portOrServer)
 }
 
-
-
 export interface IEasyServer 
 {
     AddRoute: (type: RouteMethod, path: string, exec:  (...args: unknown[]) => unknown) => void,
-    AddStatic: (baseUrl: string, folderPath: string) => void
+    AddStatic: (baseUrl: string, folderPath: string, options?: {listFiles: boolean}) => void
     AddMiddleware: ( exec: (...args: unknown[]) => unknown) => void
-    AddRedirect(destination: string,  relativeUrl: boolean): void
+    // AddRedirect(destination: string,  relativeUrl: boolean): void
     Close(): void
    // Plugins: Record<string, (server: IEasyServer) => void>
 }
@@ -151,10 +140,6 @@ export const Easyfied = (port = 0, options: IEasyOptions = {}): IEasyServer =>
     return innerEasyFied(port, options) as IEasyServer
 }
 
-
-/**
- * @deprecated This method is deprecated. Will be deleted in version 1.1. Use Easyfied method instead.
- */
 export const Close = (port = 0): void =>
 {
     if (port === 0)
@@ -166,7 +151,6 @@ export const Close = (port = 0): void =>
         deleteServer(port)
     }
 }
-
 
 export {setResponseCode as SetResponseCode} from './net/inner'
 

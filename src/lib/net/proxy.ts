@@ -7,7 +7,7 @@ import { IInnerEasyServer, RouteMethod } from './inner'
 
 
 
-export const AddRedirect = (destination: string, portOrServer: number|IInnerEasyServer = 0, relativeUrl: boolean): void =>
+/*export const AddRedirect = (destination: string, portOrServer: number|IInnerEasyServer = 0, relativeUrl: boolean): void =>
 {
     AddRoute(RouteMethod.REDIRECT, '', (_req: Http.IncomingMessage, _res: Http.ServerResponse) => {
 
@@ -30,7 +30,7 @@ export const AddRedirect = (destination: string, portOrServer: number|IInnerEasy
         _res.writeHead(301, {Location: destination})
         _res.end()
     }, portOrServer)
-}
+}*/
 
 /*export const AddFullRedirection = (originUrl: string, destinationUrl: string): void => 
 {
