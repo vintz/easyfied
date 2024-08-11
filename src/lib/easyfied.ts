@@ -14,6 +14,7 @@ import {
     setServer,
     deleteServer,
     IEasyOptions,
+    setResponseCode,
 } 
     from './net/inner'
 
@@ -59,6 +60,7 @@ const innerEasyFied = (port = 0, options: IEasyOptions = {}): IInnerEasyServer =
         AddMiddleware: ( exec: (...args: unknown[]) => unknown) => AddMiddleware(exec, server),
         //AddRedirect: (destination: string, relativeUrl?: boolean) => {AddRedirect(destination, server, relativeUrl)},
         Close: () => {server.InnerServer.close(); deleteServer(port)},
+        SetResponseCode: (code: number) => {setResponseCode(code)},
         DefaultError: options.defaultError
     }  
     
@@ -110,6 +112,7 @@ export interface IEasyServer
     AddMiddleware: ( exec: (...args: unknown[]) => unknown) => void
     // AddRedirect(destination: string,  relativeUrl: boolean): void
     Close(): void
+    SetResponseCode: (code: number) => void
    // Plugins: Record<string, (server: IEasyServer) => void>
 }
 

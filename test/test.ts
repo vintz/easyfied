@@ -96,7 +96,7 @@ server.AddRoute(RouteMethod.POST, '/hello', (name: string) =>{
 
 server.AddStatic('/file', './test/media', {listFiles: false})
 
-const server90 = Easyfied(90);
+const server90 = Easyfied(90)
 
 server90.AddStatic('/file', './test/media', {listFiles: true})
 
