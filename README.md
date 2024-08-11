@@ -10,6 +10,7 @@
 
 # Easyfied
 
+
 Very simple web framework for Node.js
 
 Easyfied is a node.js framework aimed at providing the most simple way to manage the different routes of your server.
