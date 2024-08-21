@@ -269,19 +269,23 @@ export const pathToRegexp = (path: string, method: RouteMethod): RegExp =>
     return new RegExp(res, 'i')
 }
 
-export const respond = (res: Http.ServerResponse, code: number, body : string|boolean|Record<string, unknown>|null): void =>
+export const respond = (res: Http.ServerResponse, code: number, body : string|boolean|Record<string, unknown>|null, headers: Record<string, unknown> = {}): void =>
 {
     const objType = typeof body
     if (objType === 'object')
     {
-        res.writeHead(code, {'Content-Type': 'application/json'}) 
+        headers['Content-Type'] = 'application/json'
         body = JSON.stringify(body)
     }
-    else 
+    else if (!headers['Content-Type'])
     {
-        res.writeHead(code, {'Content-Type': 'text/html'}) 
+        headers['Content-Type'] = 'text/html'
     }
     
+    Object.entries(headers).forEach((header) =>
+    {
+        res.setHeader(header[0], header[1] as string | number | ReadonlyArray<string>)
+    })
 
     if (objType !== 'string')
     {
@@ -393,11 +397,8 @@ export const  parseRequest = async (port: number, req: Http.IncomingMessage, res
 
                         const statusCode = getResponseCode()
                         const headers = getHeaders()
-                        Object.entries(headers).forEach((header) =>
-                        {
-                            res.setHeader(header[0], header[1] as string | number | ReadonlyArray<string>)
-                        })
-                        respond(res, statusCode, result as string|Record<string, unknown>)
+                      
+                        respond(res, statusCode, result as string|Record<string, unknown>, headers)
                     }
                 }
                 catch(err)
