@@ -359,7 +359,7 @@ describe('Get method test', () => {
     })
 })
 
-describe.only('Test custom response code', () => 
+describe('Test custom response code', () => 
 {
     it('should return a 418 response on http://localhost/teapot', ()=>
     {
