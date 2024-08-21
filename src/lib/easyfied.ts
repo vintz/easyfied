@@ -15,6 +15,7 @@ import {
     deleteServer,
     IEasyOptions,
     setResponseCode,
+    setHeaders,
 } 
     from './net/inner'
 
@@ -61,6 +62,7 @@ const innerEasyFied = (port = 0, options: IEasyOptions = {}): IInnerEasyServer =
         //AddRedirect: (destination: string, relativeUrl?: boolean) => {AddRedirect(destination, server, relativeUrl)},
         Close: () => {server.InnerServer.close(); deleteServer(port)},
         SetResponseCode: (code: number) => {setResponseCode(code)},
+        SetHeader: (headers:{[id: string]: string}) => {setHeaders(headers)},
         DefaultError: options.defaultError
     }  
     
@@ -113,6 +115,7 @@ export interface IEasyServer
     // AddRedirect(destination: string,  relativeUrl: boolean): void
     Close(): void
     SetResponseCode: (code: number) => void
+    SetHeader: (headers:{[id: string]: string}) => void
    // Plugins: Record<string, (server: IEasyServer) => void>
 }
 

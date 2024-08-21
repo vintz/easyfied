@@ -319,15 +319,30 @@ export const manageError = (res: Http.ServerResponse, err: EasyError|Error|strin
 
 const getResponseCode: () => number = () =>
 {
-    
     const code = this ? (this as Record<string, unknown>)?.statusCode : 200
     if (this)  (this as Record<string, unknown>).statusCode = 200
     return code as number || 200
+}
+const getHeaders: () => Record<string, unknown> = () =>
+{
+    const headers = this ? (this as Record<string, unknown>)?.headers: {}
+    if (this)  (this as Record<string, unknown>).headers = {}
+    return headers as Record<string, unknown> || {}
 }
 
 export const setResponseCode = (code: number): void =>
 {
     if (this) (this as Record<string, unknown>).statusCode = code
+}
+
+    
+export const setHeaders = (headers:{[id: string]: string}): void  =>
+{
+    if (this) 
+    {
+        const callParams = (this as Record<string, unknown>)
+        callParams.headers = {...(callParams.headers as Record<string, unknown>), ...headers}
+    }
 }
 
 export const  parseRequest = async (port: number, req: Http.IncomingMessage, res: Http.ServerResponse): Promise<void> => 
@@ -377,6 +392,11 @@ export const  parseRequest = async (port: number, req: Http.IncomingMessage, res
                         }
 
                         const statusCode = getResponseCode()
+                        const headers = getHeaders()
+                        Object.entries(headers).forEach((header) =>
+                        {
+                            res.setHeader(header[0], header[1] as string | number | ReadonlyArray<string>)
+                        })
                         respond(res, statusCode, result as string|Record<string, unknown>)
                     }
                 }

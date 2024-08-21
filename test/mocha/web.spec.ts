@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import 'mocha'
 
-import {RouteMethod, Easyfied, SetResponseCode } from '../../src/index'
+import {RouteMethod, Easyfied } from '../../src/index'
 import { EasyError } from '../../src/lib/error/error'
 import { get, post, put } from '../testLib'
 
@@ -359,7 +359,27 @@ describe('Get method test', () => {
     })
 })
 
+describe.only('Test custom response code', () => 
+{
+    it('should return a 418 response on http://localhost/teapot', ()=>
+    {
+        const server = Easyfied(80)
+        server.AddRoute(RouteMethod.GET, 'teapot', () => {
+            server.SetResponseCode(418)
+            server.SetHeader({location : 'teapot'}) 
+            return 'I\'m a teapot'
+        })
 
+        return get({Hostname: 'localhost', Port: 80, Path: '/teapot'})
+            .then((res) =>
+            {
+                server.Close()
+                expect(res.Code).to.equal(418)
+                expect(res.Headers?.location).to.equal('teapot')
+                expect(res.Result).to.equal('I\'m a teapot')
+            })
+    })
+})
 describe('Post method test', () => {
 
     it('should respond "hello world" with a 200 response on http://localhost/hw  ', () => 
@@ -451,7 +471,7 @@ describe('Addstatic test', () => {
 })
 
 describe('Test redirection', () => {
-    it.only('should return "called value test/titi" when called by http://localhost/redirect/test/titi', () => 
+    it('should return "called value test/titi" when called by http://localhost/redirect/test/titi', () => 
     {
         const port = 80
         const server = Easyfied(port)
