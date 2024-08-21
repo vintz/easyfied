@@ -170,11 +170,11 @@ describe('Get method test', () => {
 
         server1.AddRoute(RouteMethod.GET, '/hw', () => {
             return 'hello world'
-        }, port1)
+        })
 
         server2.AddRoute(RouteMethod.GET, '/hw', () => {
             return 'hw'
-        }, port2)
+        })
        
         let res1
         let res2 
@@ -418,7 +418,6 @@ describe('Post method test', () => {
 })
 
 describe('Addstatic test', () => {
-
     it('should return a png file with a 200 response on http://localhost/file/test.png  ', () => 
     {
         const port = 80
@@ -447,6 +446,27 @@ describe('Addstatic test', () => {
             {
                 server.Close()
                 expect(res.Code).to.equal(404)
+            })
+    })
+})
+
+describe('Test redirection', () => {
+    it.only('should return "called value test/titi" when called by http://localhost/redirect/test/titi', () => 
+    {
+        const port = 80
+        const server = Easyfied(port)
+
+        server.AddRoute(RouteMethod.GET, '/redirect/*content', (content: string) => {
+            return `called value ${content}`
+        })
+        
+        
+        return get({Hostname: 'localhost', Port: port, Path: '/redirect/test/titi'})
+            .then((res) =>
+            {
+                server.Close()
+                expect(res.Code).to.equal(200)
+                expect(res.Result).to.equal('called value test/titi')
             })
     })
 })
