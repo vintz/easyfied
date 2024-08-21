@@ -272,6 +272,7 @@ export const pathToRegexp = (path: string, method: RouteMethod): RegExp =>
 export const respond = (res: Http.ServerResponse, code: number, body : string|boolean|Record<string, unknown>|null, headers: Record<string, unknown> = {}): void =>
 {
     const objType = typeof body
+    
     if (objType === 'object')
     {
         headers['Content-Type'] = 'application/json'
@@ -286,6 +287,8 @@ export const respond = (res: Http.ServerResponse, code: number, body : string|bo
     {
         res.setHeader(header[0], header[1] as string | number | ReadonlyArray<string>)
     })
+
+    res.writeHead(code) 
 
     if (objType !== 'string')
     {
