@@ -1,9 +1,8 @@
 import { expect } from 'chai'
 import 'mocha'
 
-import {RouteMethod, Easyfied } from '../../src/index'
+import {RouteMethod, Easyfied, get, IResult, post, put } from '../../src/index'
 import { EasyError } from '../../src/lib/error/error'
-import { get, post, put } from '../testLib'
 
 describe('Get method test', () => {
 
@@ -11,7 +10,6 @@ describe('Get method test', () => {
     {
         const port = 80
         const server = Easyfied(port)
-        
 
         server.AddRoute(RouteMethod.GET, '/hw', () => {
             return 'hello world'
@@ -379,6 +377,26 @@ describe('Test custom response code', () =>
                 expect(res.Result).to.equal('I\'m a teapot')
             })
     })
+
+    it('should return a 418 response on http://localhost/teapot', ()=>
+    {
+        const server = Easyfied(80)
+        server.AddRoute(RouteMethod.GET, 'testheader', () => {
+            server.SetResponseCode(200)
+            server.SetHeader({location : 'teapot', 'Content-Type':'application/json'}) 
+            return 'I\'m a teapot'
+        })
+
+        return get({Hostname: 'localhost', Port: 80, Path: '/testheader'})
+            .then((res) =>
+            {
+                server.Close()
+                expect(res.Code).to.equal(200)
+                expect(res.Headers?.location).to.equal('teapot')
+                expect(res.Headers && res.Headers['content-type']).to.equal('application/json')
+                expect(res.Result).to.equal('I\'m a teapot')
+            })
+    })
 })
 describe('Post method test', () => {
 
@@ -489,6 +507,35 @@ describe('Test redirection', () => {
                 expect(res.Result).to.equal('called value test/titi')
             })
     })
+})
+
+describe('Test async functions', () => {
+    it('should return a 200 respond when called by http://localhost/async', () => 
+    {
+        const port = 80
+        const server = Easyfied(port)
+
+        server.AddRoute(RouteMethod.GET, '/async', async () => {
+            const val = await new Promise<string> ((resolve, reject) => 
+            {
+                server.SetHeader({toto: 'titi'})
+                setTimeout(()=> {resolve('ok')}, 1000)
+            })
+            return `async ${val}`
+        })
+        
+        
+        return get({Hostname: 'localhost', Port: port, Path: '/async'})
+            .then((res) =>
+            {
+                server.Close()
+                expect(res.Code).to.equal(200)
+                expect(res.Headers?.toto).to.equal('titi')
+                expect(res.Result).to.equal('async ok')
+            })
+    })
+
+   
 })
 
 // describe('Redirect test', () => {

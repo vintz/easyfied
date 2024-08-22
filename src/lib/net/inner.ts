@@ -283,10 +283,13 @@ export const respond = (res: Http.ServerResponse, code: number, body : string|bo
         headers['Content-Type'] = 'text/html'
     }
     
-    Object.entries(headers).forEach((header) =>
+    if (!res.headersSent)
     {
-        res.setHeader(header[0], header[1] as string | number | ReadonlyArray<string>)
-    })
+        Object.entries(headers).forEach((header) =>
+        {
+            res.setHeader(header[0], header[1] as string | number | ReadonlyArray<string>)
+        })
+    }
 
     res.writeHead(code) 
 
@@ -311,8 +314,6 @@ const servers: Record<number, IInnerEasyServer> = {}
 
 export const manageError = (res: Http.ServerResponse, err: EasyError|Error|string): boolean =>
 {
-    
-
     if (typeof err === 'string')
     {
         respond(res, 500, err)

@@ -115,7 +115,7 @@ export interface IEasyServer
     // AddRedirect(destination: string,  relativeUrl: boolean): void
     Close(): void
     SetResponseCode: (code: number) => void
-    SetHeader: (headers:{[id: string]: string}) => void
+    SetHeader: (headers:{[id: string]: string} | Http.IncomingHttpHeaders | undefined) => void
    // Plugins: Record<string, (server: IEasyServer) => void>
 }
 
@@ -158,7 +158,6 @@ export const Close = (port = 0): void =>
     }
 }
 
-export {setResponseCode as SetResponseCode} from './net/inner'
 
 
 
